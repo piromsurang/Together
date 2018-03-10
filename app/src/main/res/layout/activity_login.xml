@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.piromsurang.together.LoginActivity"
+    >
+
+    <TextView
+        android:id="@+id/appName"
+        android:layout_width="98dp"
+        android:layout_height="27dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginEnd="143dp"
+        android:layout_marginStart="143dp"
+        android:layout_marginTop="10dp"
+        android:text="Together?"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/emailEditText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/logoLogin" />
+
+    <ImageView
+        android:id="@+id/logoLogin"
+        android:layout_width="145dp"
+        android:layout_height="137dp"
+        android:layout_marginBottom="13dp"
+        android:layout_marginEnd="119dp"
+        android:layout_marginStart="120dp"
+        android:layout_marginTop="40dp"
+        app:layout_constraintBottom_toTopOf="@+id/appName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@android:drawable/ic_menu_report_image" />
+
+    <EditText
+        android:id="@+id/emailEditText"
+        style="@style/Widget.AppCompat.Light.AutoCompleteTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginEnd="85dp"
+        android:layout_marginStart="84dp"
+        android:layout_marginTop="20dp"
+        android:ems="10"
+        android:hint="Email"
+        android:inputType="textEmailAddress"
+        app:layout_constraintBottom_toTopOf="@+id/passwordEditText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/appName" />
+
+    <EditText
+        android:id="@+id/passwordEditText"
+        style="@android:style/Widget.Holo.Light.AutoCompleteTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginEnd="85dp"
+        android:layout_marginStart="84dp"
+        android:layout_marginTop="10dp"
+        android:ems="10"
+        android:hint="Password"
+        android:inputType="textPassword"
+        app:layout_constraintBottom_toTopOf="@+id/loginButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/emailEditText" />
+
+    <Button
+        android:id="@+id/loginButton"
+        style="@style/Widget.AppCompat.Button"
+        android:layout_width="151dp"
+        android:layout_height="47dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginEnd="116dp"
+        android:layout_marginStart="117dp"
+        android:layout_marginTop="10dp"
+        android:text="login"
+        android:onClick="onLogin"
+        app:layout_constraintBottom_toTopOf="@+id/signupTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/passwordEditText" />
+
+    <TextView
+        android:id="@+id/signupTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="237dp"
+        android:layout_marginEnd="128dp"
+        android:layout_marginStart="128dp"
+        android:text="Sign up for Together"
+        android:textAlignment="center"
+        android:textAllCaps="false"
+        android:onClick="onSignup"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/loginButton" />
+
+</android.support.constraint.ConstraintLayout>

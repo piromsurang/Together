@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Together</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="invitaion_tab">My Invitations</string>
+    <string name="friend_tab">Friends</string>
+    <string name="profile_tab">Profile</string>
+    <string name="facebook_appId">2013338852241602</string>
+    <string name="facebook_login_protocal_scheme">fb2013338852241602</string>
+</resources>
