@@ -1,12 +1,30 @@
 package com.example.piromsurang.together;
 
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+
+import com.example.piromsurang.together.adapters.InvitationAdapter;
+import com.example.piromsurang.together.models.Invitation;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -28,6 +46,16 @@ public class InvitationFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+
+    private FloatingActionButton addButton;
+    private RecyclerView recyclerView;
+    private ProgressBar progressBar;
+    private InvitationAdapter adapter;
+    private List<Invitation> invitationList = new ArrayList<>();
+    private EditText title_edit;
+    private EditText location_edit;
+    private EditText time_edit;
+    private EditText timer_edit;
 
     public InvitationFragment() {
         // Required empty public constructor
@@ -64,7 +92,23 @@ public class InvitationFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_invitation, container, false);
+        View view = inflater.inflate(R.layout.fragment_invitation, container, false);
+
+        adapter = new InvitationAdapter(invitationList);
+        addButton = (FloatingActionButton) view.findViewById(R.id.addInvitationButton);
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openAddInvitationDialog(v);
+            }
+        });
+        recyclerView = (RecyclerView) view.findViewById(R.id.invitationRecycleView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(adapter);
+        progressBar = (ProgressBar) view.findViewById(R.id.countdown_progressbar);
+
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -104,5 +148,41 @@ public class InvitationFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    public void openAddInvitationDialog(View view) {
+        final Dialog dialog = new Dialog(this.getContext());
+        LayoutInflater inflater = getLayoutInflater();
+        View layout = inflater.inflate(R.layout.dialog_add_invitation, null);
+        dialog.setContentView(layout);
+        Button create_invitation_button = (Button) dialog.findViewById(R.id.create_add_button);
+        Button cancel_dialog_button = (Button) dialog.findViewById(R.id.cancel_add_button);
+        title_edit = (EditText) dialog.findViewById(R.id.title_edittext);
+        location_edit = (EditText) dialog.findViewById(R.id.location_edittext);
+        time_edit = (EditText) dialog.findViewById(R.id.time_edittext);
+        timer_edit = (EditText) dialog.findViewById(R.id.timer_edittext);
+        create_invitation_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!(title_edit.getText().toString().isEmpty() ||
+                        location_edit.getText().toString().isEmpty() ||
+                        time_edit.getText().toString().isEmpty() ||
+                        timer_edit.getText().toString().isEmpty() )) {
+                    createInvitation();
+                    dialog.dismiss();
+                }
+            }
+        });
+        cancel_dialog_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
+    public void createInvitation() {
+        Log.d("Test", "create invitation");
     }
 }
