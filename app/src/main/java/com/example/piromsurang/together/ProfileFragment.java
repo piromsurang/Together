@@ -1,12 +1,38 @@
 package com.example.piromsurang.together;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.FaceDetector;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.facebook.AccessToken;
+import com.facebook.FacebookCallback;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.HttpMethod;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
+import com.google.firebase.auth.FacebookAuthProvider;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserInfo;
+import com.squareup.picasso.Picasso;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 /**
@@ -17,7 +43,7 @@ import android.view.ViewGroup;
  * Use the {@link ProfileFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ProfileFragment extends Fragment {
+public class ProfileFragment extends Fragment implements View.OnClickListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -28,6 +54,11 @@ public class ProfileFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+
+    private ImageView profileImageView;
+    private Button logoutButton;
+    private FirebaseAuth mAuth;
+    private TextView displayedName;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -58,14 +89,50 @@ public class ProfileFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        mAuth = FirebaseAuth.getInstance();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile, container, false);
+
+        View view = inflater.inflate(R.layout.fragment_profile, container, false);
+        profileImageView = (ImageView) view.findViewById(R.id.profileImageView);
+        logoutButton = (Button) view.findViewById(R.id.logoutButton);
+        displayedName = (TextView) view.findViewById(R.id.displayNameTextView);
+        logoutButton.setOnClickListener(this);
+        getUserImage();
+        getUserDetails();
+
+        return view;
     }
+
+
+    public void getUserImage() {
+        String facebookUserId = "";
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+//      find the Facebook profile and get the user's id
+        for(UserInfo profile : user.getProviderData()) {
+            // check if the provider id matches "facebook.com"
+            if(FacebookAuthProvider.PROVIDER_ID.equals(profile.getProviderId())) {
+                facebookUserId = profile.getUid();
+            }
+        }
+
+//      construct the URL to the profile picture, with a custom height
+//      alternatively, use '?type=small|medium|large' instead of ?height=
+        String photoUrl = "https://graph.facebook.com/" + facebookUserId + "/picture?type=large";
+        Log.d("Test", photoUrl);
+
+//      (optional) use Picasso to download and show to image
+        Picasso.with(this.getActivity()).load(photoUrl).into(profileImageView);
+
+
+
+    }
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -91,6 +158,40 @@ public class ProfileFragment extends Fragment {
         mListener = null;
     }
 
+    @Override
+    public void onClick(View v) {
+        disconnectFromFacebook();
+        mAuth.signOut();
+        Intent intent = new Intent(this.getActivity(), LoginFacebookActivity.class);
+        startActivity(intent);
+    }
+
+    public void getUserDetails() {
+        GraphRequest request = GraphRequest.newMeRequest(
+                AccessToken.getCurrentAccessToken(),
+                new GraphRequest.GraphJSONObjectCallback() {
+                    @Override
+                    public void onCompleted(
+                            JSONObject object,
+                            GraphResponse response) {
+                        // Application code
+                        try {
+                            String name = object.getString("name");
+                            displayedName.setText(name);
+                        } catch (JSONException e) {
+
+                            Log.d("Test", object.toString());
+                            e.printStackTrace();
+                        }
+
+                    }
+                });
+        Bundle parameters = new Bundle();
+        parameters.putString("fields", "id,name,link,birthday,location");
+        request.setParameters(parameters);
+        request.executeAsync();
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -105,4 +206,25 @@ public class ProfileFragment extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
+
+    public void disconnectFromFacebook() {
+
+        if (AccessToken.getCurrentAccessToken() == null) {
+            Log.d("Test", "already logged out.");
+            return; // already logged out
+        }
+
+        new GraphRequest(AccessToken.getCurrentAccessToken(), "/me/permissions/", null, HttpMethod.DELETE, new GraphRequest
+                .Callback() {
+            @Override
+            public void onCompleted(GraphResponse graphResponse) {
+
+                LoginManager.getInstance().logOut();
+
+                Log.d("Test", "logout facebook");
+
+            }
+        }).executeAsync();
+    }
+
 }

@@ -4,10 +4,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.example.piromsurang.together.FriendFragment;
 import com.example.piromsurang.together.InvitationFragment;
 import com.example.piromsurang.together.ProfileFragment;
-import com.example.piromsurang.together.models.Invitation;
 
 /**
  * Created by piromsurang on 10/3/2018 AD.
@@ -28,9 +26,6 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
                 InvitationFragment invitationFragment = new InvitationFragment();
                 return invitationFragment;
             case 1:
-                FriendFragment friendFragment = new FriendFragment();
-                return friendFragment;
-            case 2:
                 ProfileFragment profileFragment = new ProfileFragment();
                 return profileFragment;
             default:
