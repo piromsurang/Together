@@ -13,15 +13,16 @@ public class Invitation {
     private String title;
     private String location;
     private int countDownMinute;
-    private Date currentDate;
-    private CountDownTimer timer;
+    private String meeting_time;
+    private String currentTime;
     //need to implement friends
 
-    public Invitation(String title, String location, int countDownMinute, Date date) {
+    public Invitation(String title, String location, String meeting_time, int countDownMinute, String currentTime) {
         this.title = title;
         this.location = location;
+        this.meeting_time = meeting_time;
         this.countDownMinute = countDownMinute;
-        this.currentDate = date;
+        this.currentTime = currentTime;
     }
 
     public void setTitle(String title) {
@@ -42,6 +43,14 @@ public class Invitation {
 
     public int getCountDownMinute() {
         return countDownMinute;
+    }
+
+    public String getCurrentTime() {
+        return currentTime;
+    }
+
+    public String getMeeting_time() {
+        return meeting_time;
     }
 
 }
