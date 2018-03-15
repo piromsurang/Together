@@ -2,6 +2,8 @@ package com.example.piromsurang.together.models;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
+import android.widget.ArrayAdapter;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,11 +26,12 @@ public class FriendRepository {
     private static FriendRepository instance = null;
     private ArrayList<Friend> friendList;
     private ArrayList<Friend> searchedList;
-    private Context context;
+    private ArrayList<Friend> addedList;
 
     private FriendRepository() {
         friendList = new ArrayList<>();
         searchedList = new ArrayList<>();
+        addedList = new ArrayList<>();
     }
 
     public static FriendRepository getInstance() {
@@ -36,10 +39,6 @@ public class FriendRepository {
             instance = new FriendRepository();
         }
         return instance;
-    }
-
-    public void setContext(Context context) {
-        this.context = context;
     }
 
     public ArrayList<Friend> getFriendList() {
@@ -63,10 +62,14 @@ public class FriendRepository {
         return new Friend("", "");
     }
 
+    public void addToAddedList(Friend friend) {
+        addedList.add(friend);
+    }
+
     public ArrayList<Friend> searchByName(String name) {
-        searchedList.clear();
+        clearSearchedList();
         for (Friend b : friendList) {
-            if( b.getName().contains(name)) {
+            if(b.getName().toLowerCase().contains(name)) {
                 searchedList.add(b);
             }
         }
@@ -81,4 +84,17 @@ public class FriendRepository {
         return searchedList;
     }
 
+    public void removeFromAddedList(Friend friend) {
+        addedList.remove(friend);
+    }
+
+    public void clearSearchedList() {
+        searchedList.clear();
+    }
+
+    public void clearAddedList() { addedList.clear(); }
+
+    public ArrayList<Friend> getAddedList() {
+        return addedList;
+    }
 }

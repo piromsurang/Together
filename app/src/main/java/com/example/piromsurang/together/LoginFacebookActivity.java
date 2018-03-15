@@ -52,7 +52,7 @@ public class LoginFacebookActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         loginButton = (LoginButton) findViewById(R.id.loginButton);
-        loginButton.setReadPermissions("email", "public_profile", "user_friends");
+        loginButton.setReadPermissions("email", "public_profile", "user_friends","read_custom_friendlists");
         callbackManager = CallbackManager.Factory.create();
 
         LoginManager.getInstance().registerCallback(callbackManager,

@@ -38,8 +38,8 @@ public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.Vi
         }
     }
 
-    public InvitationAdapter(List<Invitation> moviesList) {
-        this.invitationList = moviesList;
+    public InvitationAdapter(List<Invitation> invitationList) {
+        this.invitationList = invitationList;
     }
 
     @Override
