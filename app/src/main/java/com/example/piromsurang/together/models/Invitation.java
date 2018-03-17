@@ -15,14 +15,15 @@ public class Invitation {
     private int countDownMinute;
     private String meeting_time;
     private String currentTime;
-    //need to implement friends
+    private InvitationType type;
 
-    public Invitation(String title, String location, String meeting_time, int countDownMinute, String currentTime) {
+    public Invitation(String title, String location, String meeting_time, int countDownMinute, String currentTime, InvitationType type) {
         this.title = title;
         this.location = location;
         this.meeting_time = meeting_time;
         this.countDownMinute = countDownMinute;
         this.currentTime = currentTime;
+        this.type = type;
     }
 
     public void setTitle(String title) {
@@ -51,6 +52,15 @@ public class Invitation {
 
     public String getMeeting_time() {
         return meeting_time;
+    }
+
+    public InvitationType getType() {
+        return type;
+    }
+
+    public enum InvitationType {
+        CREATED,
+        RECEIVED
     }
 
 }
