@@ -51,4 +51,6 @@ public class FriendPresenter {
     public void addToAddedList(Friend friend) {
         friendRepository.addToAddedList(friend);
     }
+
+    public void clearAddedList() { friendRepository.clearAddedList(); }
 }

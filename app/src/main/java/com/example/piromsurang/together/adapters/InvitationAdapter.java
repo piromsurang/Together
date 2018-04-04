@@ -1,6 +1,7 @@
 package com.example.piromsurang.together.adapters;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,10 +9,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.piromsurang.together.R;
+import com.example.piromsurang.together.models.CreatedInvitation;
 import com.example.piromsurang.together.models.Invitation;
+import com.example.piromsurang.together.models.ReceivedInvitation;
+import com.example.piromsurang.together.presenters.InvitationPresenter;
 
-import org.w3c.dom.Text;
-
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,7 +23,8 @@ import java.util.List;
 
 public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.ViewHolder> {
 
-    private List<Invitation> invitationList;
+    private InvitationPresenter presenter;
+    private List<Invitation> list;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -38,9 +42,23 @@ public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.Vi
         }
     }
 
-    public InvitationAdapter(List<Invitation> invitationList) {
-        this.invitationList = invitationList;
+    public InvitationAdapter(InvitationPresenter presenter) {
+        this.presenter = presenter;
+        this.list = new ArrayList<>();
+        addAll();
+
     }
+
+    public void addAll() {
+        for(CreatedInvitation c : presenter.getCreatedInvitationList()) {
+            list.add(c);
+        }
+
+        for(ReceivedInvitation r : presenter.getReceivedInvitationList()) {
+            list.add(r);
+        }
+    }
+
 
     @Override
     public InvitationAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -53,12 +71,18 @@ public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.Vi
 
     @Override
     public void onBindViewHolder(InvitationAdapter.ViewHolder holder, int position) {
-        Invitation invitation = invitationList.get(position);
-        holder.title.setText(invitation.getTitle());
+
+        if(list.get(position).getInvitationType() == Invitation.CREATED) {
+            CreatedInvitation invitation = (CreatedInvitation) list.get(position);
+            holder.title.setText(invitation.getTitle());
+        } else if(list.get(position).getInvitationType() == Invitation.RECEIVED) {
+            ReceivedInvitation invitation = (ReceivedInvitation) list.get(position);
+            holder.title.setText(invitation.getTitle());
+        }
     }
 
     @Override
     public int getItemCount() {
-        return invitationList.size();
+        return list.size();
     }
 }

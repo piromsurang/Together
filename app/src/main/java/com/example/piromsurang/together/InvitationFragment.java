@@ -24,9 +24,13 @@ import com.example.piromsurang.together.adapters.FriendListAdapter;
 import com.example.piromsurang.together.adapters.InvitationAdapter;
 import com.example.piromsurang.together.models.Friend;
 import com.example.piromsurang.together.models.FriendRepository;
-import com.example.piromsurang.together.models.Invitation;
+import com.example.piromsurang.together.models.CreatedInvitation;
+import com.example.piromsurang.together.models.InvitationRepository;
+import com.example.piromsurang.together.models.ReceivedInvitation;
 import com.example.piromsurang.together.presenters.FriendPresenter;
+import com.example.piromsurang.together.presenters.InvitationPresenter;
 import com.example.piromsurang.together.views.FriendView;
+import com.example.piromsurang.together.views.InvitationView;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
@@ -35,19 +39,26 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -58,7 +69,7 @@ import java.util.List;
  * Use the {@link InvitationFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class InvitationFragment extends Fragment implements FriendView {
+public class InvitationFragment extends Fragment implements FriendView, InvitationView {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -73,7 +84,7 @@ public class InvitationFragment extends Fragment implements FriendView {
     private RecyclerView invitationRecycleView;
     private ProgressBar progressBar;
     private InvitationAdapter adapter;
-    private List<Invitation> invitationList = new ArrayList<>();
+    private List<CreatedInvitation> invitationList = new ArrayList<>();
     private EditText title_edit;
     private EditText location_edit;
     private EditText time_edit;
@@ -84,6 +95,8 @@ public class InvitationFragment extends Fragment implements FriendView {
 
     private FriendRepository friendRepository;
     private FriendPresenter friendPresenter;
+    private InvitationRepository invitationRepository;
+    private InvitationPresenter invitationPresenter;
 
     private RecyclerView showFriendsRecycleView;
     private RecyclerView addedFriendsRecycleView;
@@ -117,21 +130,26 @@ public class InvitationFragment extends Fragment implements FriendView {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        database = FirebaseDatabase.getInstance();
+        myRef = database.getReference();
+        friendRepository = FriendRepository.getInstance();
+        friendPresenter = new FriendPresenter(friendRepository, this);
+        invitationRepository = InvitationRepository.getInstance();
+        invitationPresenter = new InvitationPresenter(invitationRepository, this);
+
         loadFacebookFriends();
+        loadInvitations();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        database = FirebaseDatabase.getInstance();
-        myRef = database.getReference();
-        friendRepository = FriendRepository.getInstance();
-        friendPresenter = new FriendPresenter(friendRepository, this);
 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_invitation, container, false);
 
-        adapter = new InvitationAdapter(invitationList);
+        adapter = new InvitationAdapter(invitationPresenter);
 
 
         initializeInvitationRecycleView(view);
@@ -189,6 +207,7 @@ public class InvitationFragment extends Fragment implements FriendView {
     }
 
     public void openAddInvitationDialog(View view) {
+        friendPresenter.clearAddedList();
         final Dialog dialog = new Dialog(this.getContext());
         LayoutInflater inflater = getLayoutInflater();
         View layout = inflater.inflate(R.layout.dialog_add_invitation, null);
@@ -202,6 +221,12 @@ public class InvitationFragment extends Fragment implements FriendView {
         dialog.show();
     }
 
+    @Override
+    public void displayInvitationList() {
+        invitationRecycleView.setAdapter(new InvitationAdapter(invitationPresenter));
+    }
+
+    @Override
     public void createInvitation() {
         String facebookUserId = "";
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -218,10 +243,24 @@ public class InvitationFragment extends Fragment implements FriendView {
         String time = time_edit.getText().toString();
         int countdown_time = Integer.parseInt(timer_edit.getText().toString());
         DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+
+        // need mid something in gradle module to be 26 only support API version 26 or later
+//        LocalDateTime currentTime = LocalDateTime.now();
+
         Date date = Calendar.getInstance().getTime();
-        System.out.println(dateFormat.format(date));
-        myRef.child(facebookUserId).child("invitations").setValue(new Invitation(title, location, time, countdown_time, dateFormat.format(date)));
-        Log.d("Test", "create invitation");
+        Log.d("Test time", dateFormat.format(date));
+
+        String uuid = invitationPresenter.generateUuid();
+        CreatedInvitation createdInvitation = new CreatedInvitation(title, location, time, countdown_time, dateFormat.format(date), uuid);
+        ReceivedInvitation receivedInvitation = new ReceivedInvitation(title, location, time, countdown_time, dateFormat.format(date), uuid);
+        myRef.child(facebookUserId).child("invitations").child("created").child(createdInvitation.getUuid()).setValue(createdInvitation);
+        for(int i = 0 ; i < friendPresenter.getAddedList().size() ; i++) {
+            myRef.child(facebookUserId).child("invitations").child("created").child(createdInvitation.getUuid()).child("friends").child(i+"").setValue(friendPresenter.getAddedList().get(i));
+            myRef.child(friendPresenter.getAddedList().get(i).getId()).child("invitations").child("received").child(receivedInvitation.getUuid().toString()).setValue(receivedInvitation);
+        }
+        invitationPresenter.addToCreatedInvitation(createdInvitation);
+        friendPresenter.clearAddedList();
+//        Log.d("Test", "create invitation");
     }
 
     public void initilizeOtherComponentsInvitations(View view) {
@@ -241,6 +280,7 @@ public class InvitationFragment extends Fragment implements FriendView {
         invitationRecycleView.setItemAnimator(new DefaultItemAnimator());
         invitationRecycleView.setAdapter(adapter);
     }
+
 
     public void initializeSearchEditText(Dialog dialog) {
         EditText searchFriendEditText = (EditText) dialog.findViewById(R.id.search_friends_edittext);
@@ -312,6 +352,7 @@ public class InvitationFragment extends Fragment implements FriendView {
     }
 
     public void loadFacebookFriends() {
+        friendPresenter.clearAddedList();
         String facebookUserId = "";
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -348,6 +389,54 @@ public class InvitationFragment extends Fragment implements FriendView {
                     }
                 }
         ).executeAsync();
+
+    }
+
+    public void loadInvitations() {
+        String facebookUserId = "";
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+//      find the Facebook profile and get the user's id
+        for(UserInfo profile : user.getProviderData()) {
+            // check if the provider id matches "facebook.com"
+            if(FacebookAuthProvider.PROVIDER_ID.equals(profile.getProviderId())) {
+                facebookUserId = profile.getUid();
+            }
+        }
+
+        final DatabaseReference createdInvitationRef = database.getReference(facebookUserId).child("invitations").child("created");
+        createdInvitationRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                ArrayList<Friend> friends = (ArrayList<Friend>) dataSnapshot.child("friends").getValue();
+                CreatedInvitation createdInvitation = dataSnapshot.getValue(CreatedInvitation.class);
+                if(!invitationPresenter.getCreatedInvitationList().contains(createdInvitation)){
+                    invitationPresenter.addToCreatedInvitation(createdInvitation);
+                }
+                invitationPresenter.displayRecycleView();
+//                Log.d("Test retreiving db", friends.toString());
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
     }
 }

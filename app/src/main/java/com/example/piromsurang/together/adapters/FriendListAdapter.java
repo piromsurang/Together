@@ -1,21 +1,16 @@
 package com.example.piromsurang.together.adapters;
 
-import android.content.ClipData;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.piromsurang.together.R;
 import com.example.piromsurang.together.listeners.ItemClickedListener;
 import com.example.piromsurang.together.models.Friend;
-import com.example.piromsurang.together.models.Invitation;
 import com.example.piromsurang.together.presenters.FriendPresenter;
-
-import java.util.List;
 
 /**
  * Created by piromsurang on 15/3/2018 AD.
