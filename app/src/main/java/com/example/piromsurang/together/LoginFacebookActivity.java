@@ -52,7 +52,7 @@ public class LoginFacebookActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         loginButton = (LoginButton) findViewById(R.id.loginButton);
-        loginButton.setReadPermissions("email", "public_profile", "user_friends","read_custom_friendlists");
+        loginButton.setReadPermissions("email", "public_profile", "user_friends");
         callbackManager = CallbackManager.Factory.create();
 
         LoginManager.getInstance().registerCallback(callbackManager,
@@ -101,7 +101,7 @@ public class LoginFacebookActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if(task.isSuccessful()) {
-                    Log.d("test", "User profile updated.");
+//                    Log.d("test", "User profile updated.");
                 }
             }
         });
@@ -110,7 +110,7 @@ public class LoginFacebookActivity extends AppCompatActivity {
     }
 
     private void handleFacebookAccessToken(AccessToken token) {
-        Log.d("Test", "handleFacebookAccessToken:" + token);
+//        Log.d("Test", "handleFacebookAccessToken:" + token);
 
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
         mAuth.signInWithCredential(credential)
@@ -119,12 +119,12 @@ public class LoginFacebookActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
-                            Log.d("Test", "signInWithCredential:success");
+//                            Log.d("Test", "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();
                             updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
-                            Log.w("Test", "signInWithCredential:failure", task.getException());
+//                            Log.w("Test", "signInWithCredential:failure", task.getException());
                             Toast.makeText(LoginFacebookActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                             updateUI(null);
@@ -139,7 +139,7 @@ public class LoginFacebookActivity extends AppCompatActivity {
     public void disconnectFromFacebook() {
 
         if (AccessToken.getCurrentAccessToken() == null) {
-            Log.d("Test", "already logged out.");
+//            Log.d("Test", "already logged out.");
             return; // already logged out
         }
 
@@ -150,7 +150,7 @@ public class LoginFacebookActivity extends AppCompatActivity {
 
                 LoginManager.getInstance().logOut();
 
-                Log.d("Test", "logout facebook");
+//                Log.d("Test", "logout facebook");
 
             }
         }).executeAsync();

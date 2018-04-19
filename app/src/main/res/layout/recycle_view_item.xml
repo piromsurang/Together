@@ -12,13 +12,12 @@
         android:fontFamily="monospace"
         android:textStyle="bold" />
 
-    <ProgressBar
-        android:id="@+id/countdown_progressbar"
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/countdowntime_textview"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/bottom_header_relativelayout"
-        android:max="100"
-        android:progress="0" />
+        android:fontFamily="monospace"
+        android:text="Remaining Time:"
+        android:textStyle="bold" />
 
 </LinearLayout>

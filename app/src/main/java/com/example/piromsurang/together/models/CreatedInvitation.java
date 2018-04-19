@@ -1,12 +1,5 @@
 package com.example.piromsurang.together.models;
 
-import android.os.CountDownTimer;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
 /**
  * Created by piromsurang on 10/3/2018 AD.
  */
@@ -16,15 +9,15 @@ public class CreatedInvitation implements Invitation{
     private String uuid;
     private String title;
     private String location;
-    private int countDownMinute;
+    private String countDownMinute;
     private String meeting_time;
     private String currentTime;
-    private int type;
+    private int invitationType;
 
     public CreatedInvitation(String title,
                              String location,
                              String meeting_time,
-                             int countDownMinute,
+                             String countDownMinute,
                              String currentTime,
                              String uuid) {
         this.title = title;
@@ -32,7 +25,7 @@ public class CreatedInvitation implements Invitation{
         this.meeting_time = meeting_time;
         this.countDownMinute = countDownMinute;
         this.currentTime = currentTime;
-        this.type = CREATED;
+        this.invitationType = CREATED;
         this.uuid = uuid;
     }
 
@@ -60,7 +53,7 @@ public class CreatedInvitation implements Invitation{
         return location;
     }
 
-    public int getCountDownMinute() {
+    public String getCountDownMinute() {
         return countDownMinute;
     }
 
@@ -72,9 +65,13 @@ public class CreatedInvitation implements Invitation{
         return meeting_time;
     }
 
+    public void setCountDownMinute(String countDownMinute) {
+        this.countDownMinute = countDownMinute;
+    }
+
     @Override
     public int getInvitationType() {
-        return type;
+        return invitationType;
     }
 
 }

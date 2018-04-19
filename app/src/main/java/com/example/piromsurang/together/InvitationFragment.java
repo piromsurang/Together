@@ -3,7 +3,9 @@ package com.example.piromsurang.together;
 import android.app.Dialog;
 import android.content.Context;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -19,6 +21,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.piromsurang.together.adapters.FriendListAdapter;
 import com.example.piromsurang.together.adapters.InvitationAdapter;
@@ -60,6 +64,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import static com.facebook.FacebookSdk.getApplicationContext;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -82,9 +88,7 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
     private OnFragmentInteractionListener mListener;
 
     private RecyclerView invitationRecycleView;
-    private ProgressBar progressBar;
     private InvitationAdapter adapter;
-    private List<CreatedInvitation> invitationList = new ArrayList<>();
     private EditText title_edit;
     private EditText location_edit;
     private EditText time_edit;
@@ -100,6 +104,9 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
 
     private RecyclerView showFriendsRecycleView;
     private RecyclerView addedFriendsRecycleView;
+    private String facebookUserId;
+
+    private TextView countDownTextView;
 
     public InvitationFragment() {
         // Required empty public constructor
@@ -138,8 +145,20 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
         invitationRepository = InvitationRepository.getInstance();
         invitationPresenter = new InvitationPresenter(invitationRepository, this);
 
-        loadFacebookFriends();
-        loadInvitations();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+//      find the Facebook profile and get the user's id
+        for(UserInfo profile : user.getProviderData()) {
+            // check if the provider id matches "facebook.com"
+            if(FacebookAuthProvider.PROVIDER_ID.equals(profile.getProviderId())) {
+                facebookUserId = profile.getUid();
+            }
+        }
+
+//        loadFacebookFriends();
+//        loadInvitations();
+
+        new DownloadTasks().execute();
     }
 
     @Override
@@ -228,21 +247,12 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
 
     @Override
     public void createInvitation() {
-        String facebookUserId = "";
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-//      find the Facebook profile and get the user's id
-        for(UserInfo profile : user.getProviderData()) {
-            // check if the provider id matches "facebook.com"
-            if(FacebookAuthProvider.PROVIDER_ID.equals(profile.getProviderId())) {
-                facebookUserId = profile.getUid();
-            }
-        }
-        String title = title_edit.getText().toString();
+        final String title = title_edit.getText().toString();
         String location = location_edit.getText().toString();
         String time = time_edit.getText().toString();
-        int countdown_time = Integer.parseInt(timer_edit.getText().toString());
-        DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+        final int countdown_time = Integer.parseInt(timer_edit.getText().toString());
+        final DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
         // need mid something in gradle module to be 26 only support API version 26 or later
 //        LocalDateTime currentTime = LocalDateTime.now();
@@ -250,17 +260,57 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
         Date date = Calendar.getInstance().getTime();
         Log.d("Test time", dateFormat.format(date));
 
-        String uuid = invitationPresenter.generateUuid();
-        CreatedInvitation createdInvitation = new CreatedInvitation(title, location, time, countdown_time, dateFormat.format(date), uuid);
-        ReceivedInvitation receivedInvitation = new ReceivedInvitation(title, location, time, countdown_time, dateFormat.format(date), uuid);
+        final String uuid = invitationPresenter.generateUuid();
+        final CreatedInvitation createdInvitation = new CreatedInvitation(title, location, time, countdown_time+"", dateFormat.format(date), uuid);
+        ReceivedInvitation receivedInvitation = new ReceivedInvitation(title, location, time, countdown_time +"", dateFormat.format(date), uuid);
+
         myRef.child(facebookUserId).child("invitations").child("created").child(createdInvitation.getUuid()).setValue(createdInvitation);
         for(int i = 0 ; i < friendPresenter.getAddedList().size() ; i++) {
             myRef.child(facebookUserId).child("invitations").child("created").child(createdInvitation.getUuid()).child("friends").child(i+"").setValue(friendPresenter.getAddedList().get(i));
             myRef.child(friendPresenter.getAddedList().get(i).getId()).child("invitations").child("received").child(receivedInvitation.getUuid().toString()).setValue(receivedInvitation);
         }
-        invitationPresenter.addToCreatedInvitation(createdInvitation);
         friendPresenter.clearAddedList();
 //        Log.d("Test", "create invitation");
+
+
+        //30 sec
+        new CountDownTimer(countdown_time * 60 * 1000, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+
+                int seconds = (int) (millisUntilFinished / 1000) % 60;
+                int minutes = (int) ((millisUntilFinished / (1000 * 60)) % 60);
+                int hours = (int) ((millisUntilFinished / (1000 * 60 * 60)) % 24);
+                String newtime = hours + ":" + minutes + ":" + seconds;
+                if (newtime.equals("0:0:0")) {
+                    newtime = "00:00:00";
+                } else if ((String.valueOf(hours).length() == 1) && (String.valueOf(minutes).length() == 1) && (String.valueOf(seconds).length() == 1)) {
+                    newtime = "0" + hours + ":0" + minutes + ":0" + seconds;
+                } else if ((String.valueOf(hours).length() == 1) && (String.valueOf(minutes).length() == 1)) {
+                    newtime = "0" + hours + ":0" + minutes + ":" + seconds;
+                } else if ((String.valueOf(hours).length() == 1) && (String.valueOf(seconds).length() == 1)) {
+                    newtime = "0" + hours + ":" + minutes + ":0" + seconds;
+                } else if ((String.valueOf(minutes).length() == 1) && (String.valueOf(seconds).length() == 1)) {
+                    newtime = hours + ":0" + minutes + ":0" + seconds;
+                } else if (String.valueOf(hours).length() == 1) {
+                    newtime = "0" + hours + ":" + minutes + ":" + seconds;
+                } else if (String.valueOf(minutes).length() == 1) {
+                    newtime = hours + ":0" + minutes + ":" + seconds;
+                } else if (String.valueOf(seconds).length() == 1) {
+                    newtime = hours + ":" + minutes + ":0" + seconds;
+                } else {
+                    newtime = hours + ":" + minutes + ":" + seconds;
+                }
+
+                CreatedInvitation c = createdInvitation;
+                c.setCountDownMinute(newtime);
+                myRef.child(facebookUserId).child("invitations").child("created").child(uuid).setValue(createdInvitation);
+            }
+
+            public void onFinish() {
+
+            }
+        }.start();
     }
 
     public void initilizeOtherComponentsInvitations(View view) {
@@ -271,13 +321,14 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
                 openAddInvitationDialog(v);
             }
         });
-        progressBar = (ProgressBar) view.findViewById(R.id.countdown_progressbar);
+        countDownTextView = (TextView) view.findViewById(R.id.countdowntime_textview);
+
     }
 
     public void initializeInvitationRecycleView(View view) {
         invitationRecycleView = (RecyclerView) view.findViewById(R.id.invitationRecycleView);
         invitationRecycleView.setLayoutManager(new LinearLayoutManager(this.getContext()));
-        invitationRecycleView.setItemAnimator(new DefaultItemAnimator());
+//        invitationRecycleView.setItemAnimator(new DefaultItemAnimator());
         invitationRecycleView.setAdapter(adapter);
     }
 
@@ -312,7 +363,7 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
     public void initializeAddedFriendRecycleView(Dialog dialog) {
         addedFriendsRecycleView = (RecyclerView) dialog.findViewById(R.id.added_friend_recycleview);
         addedFriendsRecycleView.setLayoutManager(new LinearLayoutManager(this.getContext()));
-        addedFriendsRecycleView.setItemAnimator(new DefaultItemAnimator());
+//        addedFriendsRecycleView.setItemAnimator(new DefaultItemAnimator());
         addedFriendsRecycleView.addItemDecoration(new DividerItemDecoration(dialog.getContext(), LinearLayoutManager.VERTICAL));
     }
 
@@ -347,96 +398,131 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
     public void initializeShowFriendRecycleView(Dialog dialog) {
         showFriendsRecycleView = (RecyclerView) dialog.findViewById(R.id.add_friend_recycleview);
         showFriendsRecycleView.setLayoutManager(new LinearLayoutManager(this.getContext()));
-        showFriendsRecycleView.setItemAnimator(new DefaultItemAnimator());
+//        showFriendsRecycleView.setItemAnimator(new DefaultItemAnimator());
         showFriendsRecycleView.addItemDecoration(new DividerItemDecoration(dialog.getContext(), LinearLayoutManager.VERTICAL));
     }
 
-    public void loadFacebookFriends() {
-        friendPresenter.clearAddedList();
-        String facebookUserId = "";
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-//      find the Facebook profile and get the user's id
-        for(UserInfo profile : user.getProviderData()) {
-            // check if the provider id matches "facebook.com"
-            if(FacebookAuthProvider.PROVIDER_ID.equals(profile.getProviderId())) {
-                facebookUserId = profile.getUid();
-            }
-        }
+    private class DownloadTasks extends AsyncTask<Void, Void, Void> {
+
+        private void loadFacebookFriends() {
+            friendPresenter.clearAddedList();
 
         /* make the API call */
-        new GraphRequest(
-                AccessToken.getCurrentAccessToken(),
-                "/" + facebookUserId + "/friends",
-                null,
-                HttpMethod.GET,
-                new GraphRequest.Callback() {
-                    public void onCompleted(GraphResponse response) {
+            new GraphRequest(
+                    AccessToken.getCurrentAccessToken(),
+                    "/me/friends",
+                    null,
+                    HttpMethod.GET,
+                    new GraphRequest.Callback() {
+                        public void onCompleted(GraphResponse response) {
                         /* handle the result */
-                        JSONObject friends = response.getJSONObject();
-                        JSONArray data = null;
-                        try {
-                            data = friends.getJSONArray("data");
+                            JSONObject friends = response.getJSONObject();
+                            JSONArray data = null;
+                            try {
+                                data = friends.getJSONArray("data");
 //                            Log.d("Test", response.toString());
-                            for(int i = 0 ; i < data.length() ; i++) {
-                                JSONObject object = data.getJSONObject(i);
-                                friendPresenter.addFriend(new Friend(object.getString("id"), object.getString("name")));
+                                for(int i = 0 ; i < data.length() ; i++) {
+                                    JSONObject object = data.getJSONObject(i);
+                                    friendPresenter.addFriend(new Friend(object.getString("id"), object.getString("name")));
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
 //                        Log.d("Test", friendRepository.getFriendList().size() + "");
+                        }
                     }
-                }
-        ).executeAsync();
+            ).executeAsync();
 
-    }
-
-    public void loadInvitations() {
-        String facebookUserId = "";
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-//      find the Facebook profile and get the user's id
-        for(UserInfo profile : user.getProviderData()) {
-            // check if the provider id matches "facebook.com"
-            if(FacebookAuthProvider.PROVIDER_ID.equals(profile.getProviderId())) {
-                facebookUserId = profile.getUid();
-            }
         }
 
-        final DatabaseReference createdInvitationRef = database.getReference(facebookUserId).child("invitations").child("created");
-        createdInvitationRef.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                ArrayList<Friend> friends = (ArrayList<Friend>) dataSnapshot.child("friends").getValue();
-                CreatedInvitation createdInvitation = dataSnapshot.getValue(CreatedInvitation.class);
-                if(!invitationPresenter.getCreatedInvitationList().contains(createdInvitation)){
-                    invitationPresenter.addToCreatedInvitation(createdInvitation);
+
+        private void loadCreatedInvitations() {
+
+            final DatabaseReference createdInvitationRef = database.getReference(facebookUserId).child("invitations").child("created");
+            createdInvitationRef.addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    ArrayList<Friend> friends = (ArrayList<Friend>) dataSnapshot.child("friends").getValue();
+                    CreatedInvitation createdInvitation = dataSnapshot.getValue(CreatedInvitation.class);
+                    if(!invitationPresenter.getCreatedInvitationList().contains(createdInvitation)){
+                        invitationPresenter.addToCreatedInvitation(createdInvitation);
+                    }
+                    invitationPresenter.displayRecycleView();
+//                Log.d("Test retreiving db", invitationPresenter.getCreatedInvitationList().get(0).getTitle());
                 }
-                invitationPresenter.displayRecycleView();
-//                Log.d("Test retreiving db", friends.toString());
-            }
 
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                    CreatedInvitation createdInvitation = dataSnapshot.getValue(CreatedInvitation.class);
+                    invitationPresenter.updateCreatedInvitation(createdInvitation);
+                    invitationPresenter.displayRecycleView();
+                }
 
-            }
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
 
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                }
 
-            }
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                }
 
-            }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+                }
+            });
 
-            }
-        });
+        }
 
+        private void loadReceivedInvitations() {
+
+            final DatabaseReference createdInvitationRef = database.getReference(facebookUserId).child("invitations").child("received");
+            createdInvitationRef.addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    ArrayList<Friend> friends = (ArrayList<Friend>) dataSnapshot.child("friends").getValue();
+                    ReceivedInvitation receivedInvitation = dataSnapshot.getValue(ReceivedInvitation.class);
+                    if(!invitationPresenter.getCreatedInvitationList().contains(receivedInvitation)){
+                        invitationPresenter.addToReceivedInvitation(receivedInvitation);
+                    }
+                    invitationPresenter.displayRecycleView();
+//                Log.d("Test retreiving db", invitationPresenter.getCreatedInvitationList().get(0).getTitle());
+                }
+
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                    ReceivedInvitation receivedInvitation = dataSnapshot.getValue(ReceivedInvitation.class);
+                    invitationPresenter.updateReceivedInvitation(receivedInvitation);
+                    invitationPresenter.displayRecycleView();
+                }
+
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                }
+
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+        }
+
+        protected Void doInBackground(Void... params) {
+            loadFacebookFriends();
+            loadCreatedInvitations();
+
+            return null;
+        }
     }
+
 }

@@ -1,9 +1,5 @@
 package com.example.piromsurang.together.models;
 
-import com.example.piromsurang.together.presenters.InvitationPresenter;
-
-import java.util.UUID;
-
 /**
  * Created by piromsurang on 29/3/2018 AD.
  */
@@ -13,16 +9,16 @@ public class ReceivedInvitation implements Invitation{
     private String uuid;
     private String title;
     private String location;
-    private int countDownMinute;
+    private String countDownMinute;
     private String meeting_time;
     private String currentTime;
-    private int type;
+    private int invitationType;
     private ReceivedStatus status;
 
     public ReceivedInvitation(String title,
                              String location,
                              String meeting_time,
-                             int countDownMinute,
+                             String countDownMinute,
                              String currentTime,
                              String uuid) {
         this.title = title;
@@ -30,7 +26,7 @@ public class ReceivedInvitation implements Invitation{
         this.meeting_time = meeting_time;
         this.countDownMinute = countDownMinute;
         this.currentTime = currentTime;
-        this.type = RECEIVED;
+        this.invitationType = RECEIVED;
         this.uuid = uuid;
     }
 
@@ -54,7 +50,7 @@ public class ReceivedInvitation implements Invitation{
         return location;
     }
 
-    public int getCountDownMinute() {
+    public String getCountDownMinute() {
         return countDownMinute;
     }
 
@@ -66,9 +62,13 @@ public class ReceivedInvitation implements Invitation{
         return currentTime;
     }
 
+    public void setCountDownMinute(String countDownMinute) {
+        this.countDownMinute = countDownMinute;
+    }
+
     @Override
     public int getInvitationType() {
-        return type;
+        return invitationType;
     }
 
     public enum ReceivedStatus {

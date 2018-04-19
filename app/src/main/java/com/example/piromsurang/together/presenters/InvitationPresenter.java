@@ -48,4 +48,20 @@ public class InvitationPresenter {
     public void displayRecycleView() {
         invitationView.displayInvitationList();
     }
+
+    public void updateCreatedInvitation(CreatedInvitation invitation) {
+        for(int i = 0 ; i < invitationRepository.getCreatedInvitationList().size() ; i++) {
+            if(invitationRepository.getCreatedInvitationList().get(i).getUuid() == invitation.getUuid()) {
+                invitationRepository.getCreatedInvitationList().get(i).setCountDownMinute(invitation.getCountDownMinute());
+            }
+        }
+    }
+
+    public void updateReceivedInvitation(ReceivedInvitation invitation) {
+        for(int i = 0 ; i < invitationRepository.getReceivedInvitationList().size() ; i++) {
+            if(invitationRepository.getReceivedInvitationList().get(i).getUuid() == invitation.getUuid()) {
+                invitationRepository.getReceivedInvitationList().get(i).setCountDownMinute(invitation.getCountDownMinute());
+            }
+        }
+    }
 }

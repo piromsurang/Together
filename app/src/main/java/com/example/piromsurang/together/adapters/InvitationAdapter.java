@@ -1,14 +1,15 @@
 package com.example.piromsurang.together.adapters;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.piromsurang.together.R;
+import com.example.piromsurang.together.listeners.FriendItemClickedListener;
+import com.example.piromsurang.together.listeners.InvitationClickedListener;
 import com.example.piromsurang.together.models.CreatedInvitation;
 import com.example.piromsurang.together.models.Invitation;
 import com.example.piromsurang.together.models.ReceivedInvitation;
@@ -29,16 +30,28 @@ public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.Vi
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public TextView title;
-        public ProgressBar progressBar;
+        public TextView remainingTime;
+        private InvitationClickedListener itemClickedListener;
+
 
         // each data item is just a string in this case
         public ViewHolder(View v) {
             super(v);
             title = v.findViewById(R.id.invitation_title);
-            progressBar = v.findViewById(R.id.countdown_progressbar);
+            remainingTime = v.findViewById(R.id.countdowntime_textview);
+            itemView.setOnClickListener(this);
+        }
+
+        public void setItemClickedListener(InvitationClickedListener itemClickedListener) {
+            this.itemClickedListener = itemClickedListener;
+        }
+
+        @Override
+        public void onClick(View v) {
+            itemClickedListener.onClick(v, getAdapterPosition());
         }
     }
 
@@ -51,11 +64,17 @@ public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.Vi
 
     public void addAll() {
         for(CreatedInvitation c : presenter.getCreatedInvitationList()) {
-            list.add(c);
+
+            if(!list.contains(c)) {
+                list.add(c);
+            }
+
         }
 
         for(ReceivedInvitation r : presenter.getReceivedInvitationList()) {
-            list.add(r);
+            if(!list.contains(r)) {
+                list.add(r);
+            }
         }
     }
 
@@ -75,10 +94,23 @@ public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.Vi
         if(list.get(position).getInvitationType() == Invitation.CREATED) {
             CreatedInvitation invitation = (CreatedInvitation) list.get(position);
             holder.title.setText(invitation.getTitle());
+            holder.remainingTime.setText("Remaining Time: " + invitation.getCountDownMinute() + "min");
+
         } else if(list.get(position).getInvitationType() == Invitation.RECEIVED) {
             ReceivedInvitation invitation = (ReceivedInvitation) list.get(position);
             holder.title.setText(invitation.getTitle());
         }
+
+        holder.setItemClickedListener(new InvitationClickedListener() {
+            @Override
+            public void onClick(View view, int position) {
+                if(list.get(position).getInvitationType() == Invitation.CREATED) {
+                    Toast.makeText(view.getContext(), "Created", Toast.LENGTH_SHORT).show();
+                } else if(list.get(position).getInvitationType() == Invitation.RECEIVED) {
+                    Toast.makeText(view.getContext(), "Received", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     @Override

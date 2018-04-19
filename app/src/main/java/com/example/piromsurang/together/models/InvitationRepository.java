@@ -34,11 +34,15 @@ public class InvitationRepository {
     }
 
     public void addToCreatedInvitation(CreatedInvitation invitation) {
-        createdInvitationList.add(invitation);
+        if(!createdInvitationList.contains(invitation)) {
+            createdInvitationList.add(invitation);
+        }
     }
 
     public void addToReceivedInvitation(ReceivedInvitation invitation) {
-        receivedInvitationList.add(invitation);
+        if(!receivedInvitationList.contains(invitation)) {
+            receivedInvitationList.add(invitation);
+        }
     }
 
     public void removeFromReceivedInvitation(ReceivedInvitation invitation) {

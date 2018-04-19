@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.piromsurang.together.R;
-import com.example.piromsurang.together.listeners.ItemClickedListener;
+import com.example.piromsurang.together.listeners.FriendItemClickedListener;
 import com.example.piromsurang.together.models.Friend;
 import com.example.piromsurang.together.presenters.FriendPresenter;
 
@@ -24,7 +24,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Vi
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public TextView name;
-        private ItemClickedListener itemClickedListener;
+        private FriendItemClickedListener itemClickedListener;
         private int permission;
 
         // each data item is just a string in this case
@@ -35,7 +35,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Vi
             this.permission = permission;
         }
 
-        public void setItemClickedListener(ItemClickedListener itemClickedListener) {
+        public void setItemClickedListener(FriendItemClickedListener itemClickedListener) {
             this.itemClickedListener = itemClickedListener;
         }
 
@@ -67,7 +67,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Vi
             friend = friendPresenter.getSearchedList().get(position);
         }
         holder.name.setText(friend.getName());
-        holder.setItemClickedListener(new ItemClickedListener() {
+        holder.setItemClickedListener(new FriendItemClickedListener() {
             @Override
             public void onClick(View view, int position, int permission) {
                 Log.d("Test", "Permission: " + permission);
