@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/created_invitation_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_weight="1"
+        android:fontFamily="monospace"
+        android:text="Title"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/created_invitation_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/created_invitation_title"
+        android:layout_marginStart="35dp"
+        android:layout_marginTop="23dp"
+        android:fontFamily="monospace"
+        android:text="Location"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/created_invitaiton_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/created_invitation_location"
+        android:layout_below="@+id/created_invitation_location"
+        android:layout_marginTop="24dp"
+        android:text="Time"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/created_invitation_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/created_invitaiton_time"
+        android:layout_below="@+id/created_invitaiton_time"
+        android:layout_marginTop="23dp"
+        android:fontFamily="monospace"
+        android:text="date"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/created_invitation_remaining_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/created_invitation_date"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="24dp"
+        android:text="Remaining Time"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/together_recycleview"
+        android:layout_width="wrap_content"
+        android:layout_height="180dp"
+        android:layout_below="@+id/created_invitation_remaining_time"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="19dp" />
+
+    <Button
+        android:id="@+id/created_invitation_cancel_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/together_recycleview"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="11dp"
+        android:text="@android:string/cancel" />
+
+
+</RelativeLayout>

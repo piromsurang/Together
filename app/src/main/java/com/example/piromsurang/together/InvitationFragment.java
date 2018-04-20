@@ -168,7 +168,7 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_invitation, container, false);
 
-        adapter = new InvitationAdapter(invitationPresenter);
+        adapter = new InvitationAdapter(invitationPresenter, this);
 
 
         initializeInvitationRecycleView(view);
@@ -242,7 +242,7 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
 
     @Override
     public void displayInvitationList() {
-        invitationRecycleView.setAdapter(new InvitationAdapter(invitationPresenter));
+        invitationRecycleView.setAdapter(new InvitationAdapter(invitationPresenter, this));
     }
 
     @Override

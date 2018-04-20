@@ -1,12 +1,17 @@
 package com.example.piromsurang.together.adapters;
 
+import android.app.Dialog;
+import android.content.Context;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.piromsurang.together.InvitationFragment;
 import com.example.piromsurang.together.R;
 import com.example.piromsurang.together.listeners.FriendItemClickedListener;
 import com.example.piromsurang.together.listeners.InvitationClickedListener;
@@ -14,6 +19,8 @@ import com.example.piromsurang.together.models.CreatedInvitation;
 import com.example.piromsurang.together.models.Invitation;
 import com.example.piromsurang.together.models.ReceivedInvitation;
 import com.example.piromsurang.together.presenters.InvitationPresenter;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +33,15 @@ public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.Vi
 
     private InvitationPresenter presenter;
     private List<Invitation> list;
+    private InvitationFragment invitationFragment;
+    private TextView titleTextView;
+    private TextView locationTextView;
+    private TextView timeTextView;
+    private TextView dateTextView;
+    private TextView remainingTimeTextView;
+    private RecyclerView togetherRecycleView;
+    private Dialog dialog;
+    private Button cancelButton;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -55,9 +71,12 @@ public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.Vi
         }
     }
 
-    public InvitationAdapter(InvitationPresenter presenter) {
+    public InvitationAdapter(InvitationPresenter presenter, InvitationFragment invitationFragment) {
         this.presenter = presenter;
         this.list = new ArrayList<>();
+        this.invitationFragment = invitationFragment;
+
+        dialog = new Dialog(invitationFragment.getContext());
         addAll();
 
     }
@@ -104,11 +123,20 @@ public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.Vi
         holder.setItemClickedListener(new InvitationClickedListener() {
             @Override
             public void onClick(View view, int position) {
+
+                LayoutInflater inflater = invitationFragment.getLayoutInflater();
+
                 if(list.get(position).getInvitationType() == Invitation.CREATED) {
                     Toast.makeText(view.getContext(), "Created", Toast.LENGTH_SHORT).show();
+                    View layout = inflater.inflate(R.layout.dialog_created_invitation, null);
+                    dialog.setContentView(layout);
+                    initializeCreatedInvitationComponent();
+
                 } else if(list.get(position).getInvitationType() == Invitation.RECEIVED) {
                     Toast.makeText(view.getContext(), "Received", Toast.LENGTH_SHORT).show();
                 }
+
+                dialog.show();
             }
         });
     }
@@ -116,5 +144,22 @@ public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.Vi
     @Override
     public int getItemCount() {
         return list.size();
+    }
+
+    public void initializeCreatedInvitationComponent() {
+        titleTextView = (TextView) dialog.findViewById(R.id.created_invitation_title);
+        locationTextView = (TextView) dialog.findViewById(R.id.created_invitation_location);
+        timeTextView = (TextView) dialog.findViewById(R.id.created_invitaiton_time);
+        dateTextView = (TextView) dialog.findViewById(R.id.created_invitation_date);
+        remainingTimeTextView = (TextView) dialog.findViewById(R.id.created_invitation_remaining_time);
+        togetherRecycleView = (RecyclerView) dialog.findViewById(R.id.together_recycleview);
+        cancelButton = (Button) dialog.findViewById(R.id.created_invitation_cancel_button);
+
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
     }
 }
