@@ -48,6 +48,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONArray;
@@ -107,6 +108,7 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
     private String facebookUserId;
 
     private TextView countDownTextView;
+    private Dialog dialog;
 
     public InvitationFragment() {
         // Required empty public constructor
@@ -203,7 +205,7 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
     @Override
     public void displayeFriendList(int permission) {
         if(permission == FriendPresenter.ON_DISPLAY_ADDED_LIST) {
-            Log.d("Test from Fragment", friendPresenter.getAddedList().size() + " added list");
+//            Log.d("Test from Fragment", friendPresenter.getAddedList().size() + " added list");
             addedFriendsRecycleView.setAdapter(new FriendListAdapter(friendPresenter, FriendPresenter.ON_DISPLAY_ADDED_LIST));
         } else if(permission == FriendPresenter.ON_DISPLAY_SEARCHED_LIST) {
             showFriendsRecycleView.setAdapter(new FriendListAdapter(friendPresenter, FriendPresenter.ON_DISPLAY_SEARCHED_LIST));
@@ -227,7 +229,7 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
 
     public void openAddInvitationDialog(View view) {
         friendPresenter.clearAddedList();
-        final Dialog dialog = new Dialog(this.getContext());
+        dialog = new Dialog(this.getContext());
         LayoutInflater inflater = getLayoutInflater();
         View layout = inflater.inflate(R.layout.dialog_add_invitation, null);
         dialog.setContentView(layout);
@@ -258,7 +260,7 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
 //        LocalDateTime currentTime = LocalDateTime.now();
 
         Date date = Calendar.getInstance().getTime();
-        Log.d("Test time", dateFormat.format(date));
+//        Log.d("Test time", dateFormat.format(date));
 
         final String uuid = invitationPresenter.generateUuid();
         final CreatedInvitation createdInvitation = new CreatedInvitation(title, location, time, countdown_time+"", dateFormat.format(date), uuid);
@@ -270,7 +272,6 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
             myRef.child(friendPresenter.getAddedList().get(i).getId()).child("invitations").child("received").child(receivedInvitation.getUuid().toString()).setValue(receivedInvitation);
         }
         friendPresenter.clearAddedList();
-//        Log.d("Test", "create invitation");
 
 
         //30 sec
@@ -443,13 +444,20 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
             createdInvitationRef.addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    ArrayList<Friend> friends = (ArrayList<Friend>) dataSnapshot.child("friends").getValue();
+                    GenericTypeIndicator<ArrayList<Friend>> t = new GenericTypeIndicator<ArrayList<Friend>>() {};
+
+//                    Log.d("Testing retreiving data", dataSnapshot.child("friends").getValue().getClass().toString());
+                    ArrayList<Friend> friends = (ArrayList<Friend>) dataSnapshot.child("friends").getValue(t);
+//                    Log.d("Testing retreiving data", friends.get(0).getName());
+
                     CreatedInvitation createdInvitation = dataSnapshot.getValue(CreatedInvitation.class);
+                    createdInvitation.setInvitedFriends(friends);
+
                     if(!invitationPresenter.getCreatedInvitationList().contains(createdInvitation)){
                         invitationPresenter.addToCreatedInvitation(createdInvitation);
                     }
                     invitationPresenter.displayRecycleView();
-//                Log.d("Test retreiving db", invitationPresenter.getCreatedInvitationList().get(0).getTitle());
+//                Log.d("Test retreiving db", createdInvitation.getInvitedFriends().size()+"");
                 }
 
                 @Override
@@ -483,7 +491,6 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
             createdInvitationRef.addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    ArrayList<Friend> friends = (ArrayList<Friend>) dataSnapshot.child("friends").getValue();
                     ReceivedInvitation receivedInvitation = dataSnapshot.getValue(ReceivedInvitation.class);
                     if(!invitationPresenter.getCreatedInvitationList().contains(receivedInvitation)){
                         invitationPresenter.addToReceivedInvitation(receivedInvitation);

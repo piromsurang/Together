@@ -1,5 +1,7 @@
 package com.example.piromsurang.together.models;
 
+import java.util.ArrayList;
+
 /**
  * Created by piromsurang on 10/3/2018 AD.
  */
@@ -13,12 +15,13 @@ public class CreatedInvitation implements Invitation{
     private String meeting_time;
     private String currentTime;
     private int invitationType;
+    private ArrayList<Friend> invitedFriends = new ArrayList<>();
 
     public CreatedInvitation(String title,
                              String location,
                              String meeting_time,
                              String countDownMinute,
-                             String currentTime,
+                             String currentTim,
                              String uuid) {
         this.title = title;
         this.location = location;
@@ -31,6 +34,11 @@ public class CreatedInvitation implements Invitation{
 
     public CreatedInvitation() {
 
+    }
+
+
+    public ArrayList<Friend> getInvitedFriends() {
+        return invitedFriends;
     }
 
     public String getUuid() {
@@ -67,6 +75,10 @@ public class CreatedInvitation implements Invitation{
 
     public void setCountDownMinute(String countDownMinute) {
         this.countDownMinute = countDownMinute;
+    }
+
+    public void setInvitedFriends(ArrayList<Friend> invitedFriends) {
+        this.invitedFriends = invitedFriends;
     }
 
     @Override

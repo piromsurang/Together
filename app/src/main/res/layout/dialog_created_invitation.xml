@@ -1,81 +1,204 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <!--<TextView-->
+        <!--android:id="@+id/created_invitation_title"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_weight="1"-->
+        <!--android:fontFamily="monospace"-->
+        <!--android:text="Title"-->
+        <!--android:textSize="24sp" />-->
+
+    <!--<TextView-->
+        <!--android:id="@+id/created_invitation_location"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginStart="20dp"-->
+        <!--android:layout_marginTop="20dp"-->
+        <!--android:fontFamily="monospace"-->
+        <!--android:text="Location"-->
+        <!--android:textSize="18sp" />-->
+
+    <!--<TextView-->
+        <!--android:id="@+id/created_invitaiton_time"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginTop="10dp"-->
+        <!--android:layout_marginStart="20dp"-->
+        <!--android:text="Time"-->
+        <!--android:textSize="18sp" />-->
+
+    <!--<TextView-->
+        <!--android:id="@+id/created_invitation_date"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginTop="10dp"-->
+        <!--android:layout_marginStart="20dp"-->
+        <!--android:fontFamily="monospace"-->
+        <!--android:text="Date : Today"-->
+        <!--android:textSize="18sp" />-->
+
+    <!--<TextView-->
+        <!--android:id="@+id/created_invitation_remaining_time"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:textAlignment="center"-->
+        <!--android:layout_marginTop="15dp"-->
+        <!--android:text="Remaining Time"-->
+        <!--android:textSize="18sp"-->
+        <!--android:textStyle="bold" />-->
+
+    <!--<TextView-->
+        <!--android:id="@+id/together_textview"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:textAlignment="center"-->
+        <!--android:layout_marginTop="10dp"-->
+        <!--android:fontFamily="monospace"-->
+        <!--android:text="Together"-->
+        <!--android:textSize="14sp" />-->
+
+    <!--<android.support.v7.widget.RecyclerView-->
+        <!--android:id="@+id/together_recycleview"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_marginTop="5dp"-->
+        <!--android:layout_height="180dp" />-->
+
+    <!--<Button-->
+        <!--android:id="@+id/created_invitation_cancel_button"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginBottom="15dp"-->
+        <!--android:layout_marginTop="5dp"-->
+        <!--android:text="@android:string/cancel" />-->
+
     <TextView
         android:id="@+id/created_invitation_title"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         android:layout_weight="1"
         android:fontFamily="monospace"
         android:text="Title"
-        android:textSize="24sp" />
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@+id/created_invitation_location"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/created_invitation_location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/created_invitation_title"
-        android:layout_marginStart="35dp"
-        android:layout_marginTop="23dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         android:fontFamily="monospace"
         android:text="Location"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/created_invitaiton_time"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/created_invitation_title" />
 
     <TextView
         android:id="@+id/created_invitaiton_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/created_invitation_location"
-        android:layout_below="@+id/created_invitation_location"
-        android:layout_marginTop="24dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
         android:text="Time"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/created_invitation_date"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/created_invitation_location" />
 
     <TextView
         android:id="@+id/created_invitation_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/created_invitaiton_time"
-        android:layout_below="@+id/created_invitaiton_time"
-        android:layout_marginTop="23dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
         android:fontFamily="monospace"
-        android:text="date"
-        android:textSize="18sp" />
+        android:text="Date : Today"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/created_invitation_remaining_time"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/created_invitaiton_time" />
 
     <TextView
         android:id="@+id/created_invitation_remaining_time"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/created_invitation_date"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="24dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="16dp"
         android:text="Remaining Time"
-        android:textSize="24sp"
-        android:textStyle="bold" />
+        android:textAlignment="center"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/together_textview"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/created_invitation_date" />
+
+    <TextView
+        android:id="@+id/together_textview"
+        android:layout_width="match_parent"
+        android:layout_height="21dp"
+        android:layout_marginTop="16dp"
+        android:fontFamily="monospace"
+        android:text="Together"
+        android:textAlignment="center"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/together_recycleview"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/created_invitation_remaining_time" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/together_recycleview"
         android:layout_width="wrap_content"
         android:layout_height="180dp"
-        android:layout_below="@+id/created_invitation_remaining_time"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="19dp" />
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/created_invitation_cancel_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/together_textview" />
 
     <Button
         android:id="@+id/created_invitation_cancel_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/together_recycleview"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="11dp"
-        android:text="@android:string/cancel" />
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="148dp"
+        android:layout_marginStart="148dp"
+        android:layout_marginTop="6dp"
+        android:text="@android:string/cancel"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/together_recycleview" />
 
 
-</RelativeLayout>
+
+
+</android.support.constraint.ConstraintLayout>
