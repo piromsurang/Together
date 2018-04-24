@@ -8,10 +8,12 @@ public class Friend {
 
     private String id;
     private String name;
+    private ReceivedInvitation.ReceivedStatus status;
 
     public Friend(String id, String name) {
         this.id = id;
         this.name = name;
+        this.status = ReceivedInvitation.ReceivedStatus.WAITING;
     }
 
     public Friend() {}
@@ -32,4 +34,11 @@ public class Friend {
         this.name = name;
     }
 
+    public ReceivedInvitation.ReceivedStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ReceivedInvitation.ReceivedStatus status) {
+        this.status = status;
+    }
 }

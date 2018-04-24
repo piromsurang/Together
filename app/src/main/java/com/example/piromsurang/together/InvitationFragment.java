@@ -462,7 +462,11 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
 
                 @Override
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                    GenericTypeIndicator<ArrayList<Friend>> t = new GenericTypeIndicator<ArrayList<Friend>>() {};
+                    ArrayList<Friend> friends = (ArrayList<Friend>) dataSnapshot.child("friends").getValue(t);
+
                     CreatedInvitation createdInvitation = dataSnapshot.getValue(CreatedInvitation.class);
+                    createdInvitation.setInvitedFriends(friends);
                     invitationPresenter.updateCreatedInvitation(createdInvitation);
                     invitationPresenter.displayRecycleView();
                 }
