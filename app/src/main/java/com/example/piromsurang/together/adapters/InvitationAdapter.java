@@ -177,7 +177,6 @@ public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.Vi
 
 
         // need to check whether friends accepted or not
-        Log.d("Testing together", c.getInvitedFriends().size() + "");
         togetherRecycleView.setAdapter(new TogetherAdapter(c.getInvitedFriends()));
 
     }
@@ -193,16 +192,18 @@ public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.Vi
         public class ViewHolder extends RecyclerView.ViewHolder {
             // each data item is just a string in this case
             public TextView friendTextView;
+            public TextView statusTextView;
             public ViewHolder(View v) {
                 super(v);
-                friendTextView = (TextView) v.findViewById(R.id.displayFriendName);
+                friendTextView = (TextView) v.findViewById(R.id.created_invitation_friend_name);
+                statusTextView = (TextView) v.findViewById(R.id.created_invitation_status);
             }
         }
 
         @Override
         public TogetherAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View itemView = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.friend_recycleview_item, parent, false);
+                    .inflate(R.layout.dialog_created_invitation_friend_status_item, parent, false);
 
             return new TogetherAdapter.ViewHolder(itemView);
         }
@@ -210,6 +211,15 @@ public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.Vi
         @Override
         public void onBindViewHolder(TogetherAdapter.ViewHolder holder, int position) {
             holder.friendTextView.setText(invitedFriends.get(position).getName());
+
+            Log.d("Testing invited friends", invitedFriends.get(position).getStatus().toString());
+            if(invitedFriends.get(position).getStatus() == ReceivedInvitation.ReceivedStatus.WAITING) {
+                holder.statusTextView.setText("?");
+            } else if(invitedFriends.get(position).getStatus() == ReceivedInvitation.ReceivedStatus.ACCEPT) {
+                holder.statusTextView.setText("YES");
+            } else if(invitedFriends.get(position).getStatus() == ReceivedInvitation.ReceivedStatus.DECLINE) {
+                holder.statusTextView.setText("NO");
+            }
         }
 
         @Override

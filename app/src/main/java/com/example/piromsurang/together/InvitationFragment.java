@@ -303,9 +303,7 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
                     newtime = hours + ":" + minutes + ":" + seconds;
                 }
 
-                CreatedInvitation c = createdInvitation;
-                c.setCountDownMinute(newtime);
-                myRef.child(facebookUserId).child("invitations").child("created").child(uuid).setValue(createdInvitation);
+                myRef.child(facebookUserId).child("invitations").child("created").child(uuid).child("countDownMinute").setValue(newtime);
             }
 
             public void onFinish() {
