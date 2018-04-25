@@ -14,12 +14,15 @@ public class ReceivedInvitation implements Invitation{
     private String currentTime;
     private int invitationType;
     private ReceivedStatus status;
+    private String sender;
+    private int index = -1;
 
     public ReceivedInvitation(String title,
                              String location,
                              String meeting_time,
                              String countDownMinute,
                              String currentTime,
+                             String sender,
                              String uuid) {
         this.title = title;
         this.location = location;
@@ -28,6 +31,11 @@ public class ReceivedInvitation implements Invitation{
         this.currentTime = currentTime;
         this.invitationType = RECEIVED;
         this.uuid = uuid;
+        this.sender = sender;
+    }
+
+    public ReceivedInvitation() {
+
     }
 
     public ReceivedStatus getStatus() {
@@ -64,6 +72,18 @@ public class ReceivedInvitation implements Invitation{
 
     public void setCountDownMinute(String countDownMinute) {
         this.countDownMinute = countDownMinute;
+    }
+
+    public String getSender() {
+        return sender;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
     }
 
     @Override

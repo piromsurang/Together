@@ -48,4 +48,21 @@ public class InvitationRepository {
     public void removeFromReceivedInvitation(ReceivedInvitation invitation) {
         receivedInvitationList.remove(invitation);
     }
+
+    public CreatedInvitation getCreatedInvitationFromUuid(String uuid) {
+        for(CreatedInvitation c : createdInvitationList) {
+            if(c.getUuid().equals(uuid)) {
+                return c;
+            }
+        }
+        return new CreatedInvitation();
+    }
+    public ReceivedInvitation getReceivedInvitationFromUuid(String uuid) {
+        for(ReceivedInvitation c : receivedInvitationList) {
+            if(c.getUuid().equals(uuid)) {
+                return c;
+            }
+        }
+        return new ReceivedInvitation();
+    }
 }

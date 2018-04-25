@@ -10,4 +10,5 @@ public interface Invitation {
     int RECEIVED = 2;
 
     public int getInvitationType();
+    public String getUuid();
 }

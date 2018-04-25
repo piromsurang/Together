@@ -64,4 +64,12 @@ public class InvitationPresenter {
             }
         }
     }
+
+    public CreatedInvitation getCreatedInvitationFromUuid(String uuid) {
+        return invitationRepository.getCreatedInvitationFromUuid(uuid);
+    }
+
+    public ReceivedInvitation getReceivedInvitationFromUuid(String uuid) {
+        return invitationRepository.getReceivedInvitationFromUuid(uuid);
+    }
 }

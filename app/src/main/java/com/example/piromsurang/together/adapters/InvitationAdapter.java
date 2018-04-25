@@ -22,6 +22,12 @@ import com.example.piromsurang.together.models.Friend;
 import com.example.piromsurang.together.models.Invitation;
 import com.example.piromsurang.together.models.ReceivedInvitation;
 import com.example.piromsurang.together.presenters.InvitationPresenter;
+import com.google.firebase.auth.FacebookAuthProvider;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserInfo;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.w3c.dom.Text;
 
@@ -46,6 +52,8 @@ public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.Vi
     private RecyclerView togetherRecycleView;
     private Dialog dialog;
     private Button cancelButton;
+    private Button declineButton;
+    private Button acceptButton;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -123,6 +131,7 @@ public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.Vi
         } else if(list.get(position).getInvitationType() == Invitation.RECEIVED) {
             ReceivedInvitation invitation = (ReceivedInvitation) list.get(position);
             holder.title.setText(invitation.getTitle());
+            holder.remainingTime.setText("Remaining Time: " + invitation.getCountDownMinute() + "min");
         }
 
         holder.setItemClickedListener(new InvitationClickedListener() {
@@ -130,7 +139,6 @@ public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.Vi
             public void onClick(View view, int position) {
 
                 LayoutInflater inflater = invitationFragment.getLayoutInflater();
-
                 if(list.get(position).getInvitationType() == Invitation.CREATED) {
                     View layout = inflater.inflate(R.layout.dialog_created_invitation, null);
                     dialog.setContentView(layout);
@@ -138,6 +146,9 @@ public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.Vi
 
                 } else if(list.get(position).getInvitationType() == Invitation.RECEIVED) {
                     Toast.makeText(view.getContext(), "Received", Toast.LENGTH_SHORT).show();
+                    View layout = inflater.inflate(R.layout.dialog_received_invitation, null);
+                    dialog.setContentView(layout);
+                    initializeReceivedInvitationComponent(position);
                 }
 
                 dialog.show();
@@ -166,7 +177,7 @@ public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.Vi
             }
         });
 
-        CreatedInvitation c = presenter.getCreatedInvitationList().get(position);
+        CreatedInvitation c = presenter.getCreatedInvitationFromUuid(list.get(position).getUuid());
 
         titleTextView.setText(c.getTitle());
         locationTextView.setText("Location : " + c.getLocation());
@@ -178,7 +189,82 @@ public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.Vi
 
         // need to check whether friends accepted or not
         togetherRecycleView.setAdapter(new TogetherAdapter(c.getInvitedFriends()));
+    }
 
+    public void initializeReceivedInvitationComponent(final int position) {
+        titleTextView = (TextView) dialog.findViewById(R.id.received_invitation_title);
+        locationTextView = (TextView) dialog.findViewById(R.id.received_invitation_location);
+        timeTextView = (TextView) dialog.findViewById(R.id.received_inivitaiton_time);
+        dateTextView = (TextView) dialog.findViewById(R.id.received_invitation_date);
+        remainingTimeTextView = (TextView) dialog.findViewById(R.id.received_invitation_remaining_time);
+        declineButton = (Button) dialog.findViewById(R.id.received_invitaiton_decline_button);
+        acceptButton = (Button) dialog.findViewById(R.id.received_invitaiton_accept_button);
+
+        final ReceivedInvitation r = presenter.getReceivedInvitationFromUuid(list.get(position).getUuid());
+
+        final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+        declineButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                databaseReference.child(r.getSender())
+                        .child("invitations")
+                        .child("created")
+                        .child(r.getUuid())
+                        .child("friends")
+                        .child(r.getIndex()+"")
+                        .child("status")
+                        .setValue(ReceivedInvitation.ReceivedStatus.DECLINE);
+
+//                databaseReference.child(getFacebookUserId())
+//                        .child("invitations")
+//                        .child("received")
+//                        .child(list.get(position).getUuid()).removeValue();
+
+                dialog.dismiss();
+            }
+        });
+
+        acceptButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                databaseReference.child(r.getSender())
+                        .child("invitations")
+                        .child("created")
+                        .child(r.getUuid())
+                        .child("friends")
+                        .child(r.getIndex()+"")
+                        .child("status")
+                        .setValue(ReceivedInvitation.ReceivedStatus.ACCEPT);
+
+//                databaseReference.child(getFacebookUserId())
+//                        .child("invitations")
+//                        .child("received")
+//                        .child(list.get(position).getUuid()).removeValue();
+
+                dialog.dismiss();
+            }
+        });
+
+        titleTextView.setText(r.getTitle());
+        locationTextView.setText("Location : " + r.getLocation());
+        timeTextView.setText("Time : " + r.getMeeting_time());
+        remainingTimeTextView.setText("Remaining Time : " + r.getCountDownMinute());
+
+
+    }
+
+    public String getFacebookUserId() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        String facebookUserId = "";
+//      find the Facebook profile and get the user's id
+        for(UserInfo profile : user.getProviderData()) {
+            // check if the provider id matches "facebook.com"
+            if(FacebookAuthProvider.PROVIDER_ID.equals(profile.getProviderId())) {
+                facebookUserId = profile.getUid();
+            }
+        }
+        return facebookUserId;
     }
 
     private class TogetherAdapter extends RecyclerView.Adapter<TogetherAdapter.ViewHolder>  {
@@ -212,7 +298,7 @@ public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.Vi
         public void onBindViewHolder(TogetherAdapter.ViewHolder holder, int position) {
             holder.friendTextView.setText(invitedFriends.get(position).getName());
 
-            Log.d("Testing invited friends", invitedFriends.get(position).getStatus().toString());
+//            Log.d("Testing invited friends", invitedFriends.get(position).getStatus().toString());
             if(invitedFriends.get(position).getStatus() == ReceivedInvitation.ReceivedStatus.WAITING) {
                 holder.statusTextView.setText("?");
             } else if(invitedFriends.get(position).getStatus() == ReceivedInvitation.ReceivedStatus.ACCEPT) {

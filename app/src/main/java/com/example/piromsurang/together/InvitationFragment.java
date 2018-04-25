@@ -264,11 +264,12 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
 
         final String uuid = invitationPresenter.generateUuid();
         final CreatedInvitation createdInvitation = new CreatedInvitation(title, location, time, countdown_time+"", dateFormat.format(date), uuid);
-        ReceivedInvitation receivedInvitation = new ReceivedInvitation(title, location, time, countdown_time +"", dateFormat.format(date), uuid);
+        ReceivedInvitation receivedInvitation = new ReceivedInvitation(title, location, time, countdown_time +"", dateFormat.format(date), facebookUserId, uuid);
 
         myRef.child(facebookUserId).child("invitations").child("created").child(createdInvitation.getUuid()).setValue(createdInvitation);
         for(int i = 0 ; i < friendPresenter.getAddedList().size() ; i++) {
             myRef.child(facebookUserId).child("invitations").child("created").child(createdInvitation.getUuid()).child("friends").child(i+"").setValue(friendPresenter.getAddedList().get(i));
+            receivedInvitation.setIndex(i);
             myRef.child(friendPresenter.getAddedList().get(i).getId()).child("invitations").child("received").child(receivedInvitation.getUuid().toString()).setValue(receivedInvitation);
         }
         friendPresenter.clearAddedList();
@@ -493,8 +494,9 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
             createdInvitationRef.addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    Log.d("receiving testing", "o");
                     ReceivedInvitation receivedInvitation = dataSnapshot.getValue(ReceivedInvitation.class);
-                    if(!invitationPresenter.getCreatedInvitationList().contains(receivedInvitation)){
+                    if(!invitationPresenter.getReceivedInvitationList().contains(receivedInvitation)){
                         invitationPresenter.addToReceivedInvitation(receivedInvitation);
                     }
                     invitationPresenter.displayRecycleView();
@@ -529,6 +531,7 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
         protected Void doInBackground(Void... params) {
             loadFacebookFriends();
             loadCreatedInvitations();
+            loadReceivedInvitations();
 
             return null;
         }
