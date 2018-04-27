@@ -269,7 +269,6 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
         CreatedInvitation createdInvitation = new CreatedInvitation(title, location, time, countdown_time+"", date, timeout, uuid);
         ReceivedInvitation receivedInvitation = new ReceivedInvitation(title, location, time, countdown_time +"", date, timeout, facebookUserId, uuid);
         createdInvitation.setInvitedFriends(friendPresenter.getAddedList());
-        Log.d("ddd", createdInvitation.getInvitedFriends().size()+"");
         myRef.child(facebookUserId).child("invitations").child("created").child(createdInvitation.getUuid()).setValue(createdInvitation);
         for(int i = 0 ; i < friendPresenter.getAddedList().size() ; i++) {
 //            myRef.child(facebookUserId).child("invitations").child("created").child(createdInvitation.getUuid()).child("friends").child(i+"").setValue(friendPresenter.getAddedList().get(i));
@@ -309,11 +308,11 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
                 } else {
                     newtime = hours + ":" + minutes + ":" + seconds;
                 }
-                Log.d("dd", "out");
+
                 myRef.child(facebookUserId).child("invitations").child("created").child(uuid).child("countDownMinute").setValue(newtime);
-                Log.d("dd", cc.getInvitedFriends().size()+"");
+
                 for(int i = 0 ; i < cc.getInvitedFriends().size() ; i++) {
-                    Log.d("Testing countdown", cc.getInvitedFriends().get(i).getName());
+
                     myRef.child(cc.getInvitedFriends().get(i).getId()).child("invitations").child("received").child(cc.getUuid()).child("countDownMinute").setValue(newtime);
                 }
             }
@@ -455,17 +454,60 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
             createdInvitationRef.addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    GenericTypeIndicator<ArrayList<Friend>> t = new GenericTypeIndicator<ArrayList<Friend>>() {};
+//                    GenericTypeIndicator<ArrayList<Friend>> t = new GenericTypeIndicator<ArrayList<Friend>>() {};
 
 //                    Log.d("Testing retreiving data", dataSnapshot.child("friends").getValue().getClass().toString());
 //                    ArrayList<Friend> friends = (ArrayList<Friend>) dataSnapshot.child("friends").getValue(t);
 //                    Log.d("Testing retreiving data", friends.get(0).getName());
 
-                    CreatedInvitation createdInvitation = dataSnapshot.getValue(CreatedInvitation.class);
+                    final CreatedInvitation createdInvitation = dataSnapshot.getValue(CreatedInvitation.class);
 //                    createdInvitation.setInvitedFriends(friends);
-
                     if(!invitationPresenter.getCreatedInvitationList().contains(createdInvitation)){
                         invitationPresenter.addToCreatedInvitation(createdInvitation);
+                    }
+                    if(createdInvitation.getTimeoutTime().getTime() - Calendar.getInstance().getTime().getTime() > 0) {
+                        new CountDownTimer(createdInvitation.getTimeoutTime().getTime() - Calendar.getInstance().getTime().getTime(), 1000) {
+
+                            private CreatedInvitation c;
+
+                            public void onTick(long millisUntilFinished) {
+
+                                int seconds = (int) (millisUntilFinished / 1000) % 60;
+                                int minutes = (int) ((millisUntilFinished / (1000 * 60)) % 60);
+                                int hours = (int) ((millisUntilFinished / (1000 * 60 * 60)) % 24);
+                                String newtime = hours + ":" + minutes + ":" + seconds;
+                                if (newtime.equals("0:0:0")) {
+                                    newtime = "00:00:00";
+                                } else if ((String.valueOf(hours).length() == 1) && (String.valueOf(minutes).length() == 1) && (String.valueOf(seconds).length() == 1)) {
+                                    newtime = "0" + hours + ":0" + minutes + ":0" + seconds;
+                                } else if ((String.valueOf(hours).length() == 1) && (String.valueOf(minutes).length() == 1)) {
+                                    newtime = "0" + hours + ":0" + minutes + ":" + seconds;
+                                } else if ((String.valueOf(hours).length() == 1) && (String.valueOf(seconds).length() == 1)) {
+                                    newtime = "0" + hours + ":" + minutes + ":0" + seconds;
+                                } else if ((String.valueOf(minutes).length() == 1) && (String.valueOf(seconds).length() == 1)) {
+                                    newtime = hours + ":0" + minutes + ":0" + seconds;
+                                } else if (String.valueOf(hours).length() == 1) {
+                                    newtime = "0" + hours + ":" + minutes + ":" + seconds;
+                                } else if (String.valueOf(minutes).length() == 1) {
+                                    newtime = hours + ":0" + minutes + ":" + seconds;
+                                } else if (String.valueOf(seconds).length() == 1) {
+                                    newtime = hours + ":" + minutes + ":0" + seconds;
+                                } else {
+                                    newtime = hours + ":" + minutes + ":" + seconds;
+                                }
+
+                                myRef.child(facebookUserId).child("invitations").child("created").child(createdInvitation.getUuid()).child("countDownMinute").setValue(newtime);
+
+                                for(int i = 0 ; i < createdInvitation.getInvitedFriends().size() ; i++) {
+
+                                    myRef.child(createdInvitation.getInvitedFriends().get(i).getId()).child("invitations").child("received").child(createdInvitation.getUuid()).child("countDownMinute").setValue(newtime);
+                                }
+                            }
+
+                            public void onFinish() {
+
+                            }
+                        }.start();
                     }
                     invitationPresenter.displayRecycleView();
 //                Log.d("Test retreiving db", createdInvitation.getInvitedFriends().size()+"");
@@ -508,7 +550,7 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     Log.d("receiving testing", "o");
                     ReceivedInvitation receivedInvitation = dataSnapshot.getValue(ReceivedInvitation.class);
-                    if(!invitationPresenter.getReceivedInvitationList().contains(receivedInvitation)){
+                    if((!invitationPresenter.getReceivedInvitationList().contains(receivedInvitation)) ){
                         invitationPresenter.addToReceivedInvitation(receivedInvitation);
                     }
                     invitationPresenter.displayRecycleView();
