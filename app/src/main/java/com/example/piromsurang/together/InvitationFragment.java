@@ -460,7 +460,8 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
 
                     final CreatedInvitation createdInvitation = dataSnapshot.getValue(CreatedInvitation.class);
 //                    createdInvitation.setInvitedFriends(friends);
-                    if(!invitationPresenter.getCreatedInvitationList().contains(createdInvitation)){
+                    if((!invitationPresenter.getCreatedInvitationList().contains(createdInvitation)) &&
+                            (Calendar.getInstance().getTime().getTime() - createdInvitation.getCreatedTime().getTime() < 86400000)){
                         invitationPresenter.addToCreatedInvitation(createdInvitation);
                     }
                     try {
@@ -505,6 +506,12 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
 
                                 }
                             }.start();
+                        } else {
+                            myRef.child(facebookUserId).child("invitations").child("created").child(createdInvitation.getUuid()).child("countDownMinute").setValue("00:00:00");
+
+                            for(int i = 0 ; i < createdInvitation.getInvitedFriends().size() ; i++) {
+                                myRef.child(createdInvitation.getInvitedFriends().get(i).getId()).child("invitations").child("received").child(createdInvitation.getUuid()).child("countDownMinute").setValue("00:00:00");
+                            }
                         }
                     } catch(NullPointerException e) {
                         e.printStackTrace();
@@ -587,9 +594,38 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
                             }
 
                             public void onFinish() {
+                                myRef.child(receivedInvitation.getSender())
+                                        .child("invitations")
+                                        .child("created")
+                                        .child(receivedInvitation.getUuid())
+                                        .child("invitedFriends")
+                                        .child(receivedInvitation.getIndex()+"")
+                                        .child("status")
+                                        .setValue(ReceivedInvitation.ReceivedStatus.DECLINE);
 
+                                myRef.child(facebookUserId)
+                                        .child("invitations")
+                                        .child("received")
+                                        .child(receivedInvitation.getUuid()).removeValue();
+
+                                invitationPresenter.removeFromReceivedInvitation(receivedInvitation);
+                                displayInvitationList();
                             }
                         }.start();
+                    } else {
+                        myRef.child(receivedInvitation.getSender())
+                                .child("invitations")
+                                .child("created")
+                                .child(receivedInvitation.getUuid())
+                                .child("invitedFriends")
+                                .child(receivedInvitation.getIndex()+"")
+                                .child("status")
+                                .setValue(ReceivedInvitation.ReceivedStatus.DECLINE);
+
+                        myRef.child(facebookUserId)
+                        .child("invitations")
+                        .child("received")
+                        .child(receivedInvitation.getUuid()).removeValue();
                     }
                     invitationPresenter.displayRecycleView();
 //                Log.d("Test retreiving db", invitationPresenter.getCreatedInvitationList().get(0).getTitle());
