@@ -211,7 +211,7 @@ public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.Vi
                         .child("invitations")
                         .child("created")
                         .child(r.getUuid())
-                        .child("friends")
+                        .child("invitedFriends")
                         .child(r.getIndex()+"")
                         .child("status")
                         .setValue(ReceivedInvitation.ReceivedStatus.DECLINE);
@@ -232,7 +232,7 @@ public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.Vi
                         .child("invitations")
                         .child("created")
                         .child(r.getUuid())
-                        .child("friends")
+                        .child("invitedFriends")
                         .child(r.getIndex()+"")
                         .child("status")
                         .setValue(ReceivedInvitation.ReceivedStatus.ACCEPT);

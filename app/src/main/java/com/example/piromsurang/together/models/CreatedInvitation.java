@@ -1,6 +1,8 @@
 package com.example.piromsurang.together.models;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by piromsurang on 10/3/2018 AD.
@@ -13,7 +15,8 @@ public class CreatedInvitation implements Invitation{
     private String location;
     private String countDownMinute;
     private String meeting_time;
-    private String currentTime;
+    private Date createdTime;
+    private Date timeoutTime;
     private int invitationType;
     private ArrayList<Friend> invitedFriends = new ArrayList<>();
 
@@ -21,13 +24,15 @@ public class CreatedInvitation implements Invitation{
                              String location,
                              String meeting_time,
                              String countDownMinute,
-                             String currentTim,
+                             Date createdTime,
+                             Date timeoutTime,
                              String uuid) {
         this.title = title;
         this.location = location;
         this.meeting_time = meeting_time;
         this.countDownMinute = countDownMinute;
-        this.currentTime = currentTime;
+        this.createdTime = createdTime;
+        this.timeoutTime = timeoutTime;
         this.invitationType = CREATED;
         this.uuid = uuid;
     }
@@ -65,8 +70,8 @@ public class CreatedInvitation implements Invitation{
         return countDownMinute;
     }
 
-    public String getCurrentTime() {
-        return currentTime;
+    public Date getCreatedTime() {
+        return createdTime;
     }
 
     public String getMeeting_time() {
@@ -79,6 +84,10 @@ public class CreatedInvitation implements Invitation{
 
     public void setInvitedFriends(ArrayList<Friend> invitedFriends) {
         this.invitedFriends = invitedFriends;
+    }
+
+    public Date getTimeoutTime() {
+        return timeoutTime;
     }
 
     @Override

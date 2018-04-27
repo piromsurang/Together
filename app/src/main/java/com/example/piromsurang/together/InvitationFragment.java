@@ -254,63 +254,66 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
         String location = location_edit.getText().toString();
         String time = time_edit.getText().toString();
         final int countdown_time = Integer.parseInt(timer_edit.getText().toString());
-        final DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+//        final DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
         // need mid something in gradle module to be 26 only support API version 26 or later
 //        LocalDateTime currentTime = LocalDateTime.now();
 
-        Date date = Calendar.getInstance().getTime();
+        Calendar c = Calendar.getInstance();
+        Date date = c.getTime();
+        c.add(Calendar.MINUTE, countdown_time);
+        Date timeout = c.getTime();
 //        Log.d("Test time", dateFormat.format(date));
 
         final String uuid = invitationPresenter.generateUuid();
-        final CreatedInvitation createdInvitation = new CreatedInvitation(title, location, time, countdown_time+"", dateFormat.format(date), uuid);
-        ReceivedInvitation receivedInvitation = new ReceivedInvitation(title, location, time, countdown_time +"", dateFormat.format(date), facebookUserId, uuid);
-
+        final CreatedInvitation createdInvitation = new CreatedInvitation(title, location, time, countdown_time+"", date, timeout, uuid);
+        ReceivedInvitation receivedInvitation = new ReceivedInvitation(title, location, time, countdown_time +"", date, timeout, facebookUserId, uuid);
+        createdInvitation.setInvitedFriends(friendPresenter.getAddedList());
         myRef.child(facebookUserId).child("invitations").child("created").child(createdInvitation.getUuid()).setValue(createdInvitation);
         for(int i = 0 ; i < friendPresenter.getAddedList().size() ; i++) {
             myRef.child(facebookUserId).child("invitations").child("created").child(createdInvitation.getUuid()).child("friends").child(i+"").setValue(friendPresenter.getAddedList().get(i));
             receivedInvitation.setIndex(i);
-            myRef.child(friendPresenter.getAddedList().get(i).getId()).child("invitations").child("received").child(receivedInvitation.getUuid().toString()).setValue(receivedInvitation);
+//            myRef.child(friendPresenter.getAddedList().get(i).getId()).child("invitations").child("received").child(receivedInvitation.getUuid().toString()).setValue(receivedInvitation);
         }
         friendPresenter.clearAddedList();
 
-
         //30 sec
-        new CountDownTimer(countdown_time * 60 * 1000, 1000) {
-
-            public void onTick(long millisUntilFinished) {
-
-                int seconds = (int) (millisUntilFinished / 1000) % 60;
-                int minutes = (int) ((millisUntilFinished / (1000 * 60)) % 60);
-                int hours = (int) ((millisUntilFinished / (1000 * 60 * 60)) % 24);
-                String newtime = hours + ":" + minutes + ":" + seconds;
-                if (newtime.equals("0:0:0")) {
-                    newtime = "00:00:00";
-                } else if ((String.valueOf(hours).length() == 1) && (String.valueOf(minutes).length() == 1) && (String.valueOf(seconds).length() == 1)) {
-                    newtime = "0" + hours + ":0" + minutes + ":0" + seconds;
-                } else if ((String.valueOf(hours).length() == 1) && (String.valueOf(minutes).length() == 1)) {
-                    newtime = "0" + hours + ":0" + minutes + ":" + seconds;
-                } else if ((String.valueOf(hours).length() == 1) && (String.valueOf(seconds).length() == 1)) {
-                    newtime = "0" + hours + ":" + minutes + ":0" + seconds;
-                } else if ((String.valueOf(minutes).length() == 1) && (String.valueOf(seconds).length() == 1)) {
-                    newtime = hours + ":0" + minutes + ":0" + seconds;
-                } else if (String.valueOf(hours).length() == 1) {
-                    newtime = "0" + hours + ":" + minutes + ":" + seconds;
-                } else if (String.valueOf(minutes).length() == 1) {
-                    newtime = hours + ":0" + minutes + ":" + seconds;
-                } else if (String.valueOf(seconds).length() == 1) {
-                    newtime = hours + ":" + minutes + ":0" + seconds;
-                } else {
-                    newtime = hours + ":" + minutes + ":" + seconds;
-                }
-
-                myRef.child(facebookUserId).child("invitations").child("created").child(uuid).child("countDownMinute").setValue(newtime);
-            }
-
-            public void onFinish() {
-
-            }
-        }.start();
+//        new CountDownTimer(countdown_time * 60 * 1000, 1000) {
+//
+//            public void onTick(long millisUntilFinished) {
+//
+//                int seconds = (int) (millisUntilFinished / 1000) % 60;
+//                int minutes = (int) ((millisUntilFinished / (1000 * 60)) % 60);
+//                int hours = (int) ((millisUntilFinished / (1000 * 60 * 60)) % 24);
+//                String newtime = hours + ":" + minutes + ":" + seconds;
+//                if (newtime.equals("0:0:0")) {
+//                    newtime = "00:00:00";
+//                } else if ((String.valueOf(hours).length() == 1) && (String.valueOf(minutes).length() == 1) && (String.valueOf(seconds).length() == 1)) {
+//                    newtime = "0" + hours + ":0" + minutes + ":0" + seconds;
+//                } else if ((String.valueOf(hours).length() == 1) && (String.valueOf(minutes).length() == 1)) {
+//                    newtime = "0" + hours + ":0" + minutes + ":" + seconds;
+//                } else if ((String.valueOf(hours).length() == 1) && (String.valueOf(seconds).length() == 1)) {
+//                    newtime = "0" + hours + ":" + minutes + ":0" + seconds;
+//                } else if ((String.valueOf(minutes).length() == 1) && (String.valueOf(seconds).length() == 1)) {
+//                    newtime = hours + ":0" + minutes + ":0" + seconds;
+//                } else if (String.valueOf(hours).length() == 1) {
+//                    newtime = "0" + hours + ":" + minutes + ":" + seconds;
+//                } else if (String.valueOf(minutes).length() == 1) {
+//                    newtime = hours + ":0" + minutes + ":" + seconds;
+//                } else if (String.valueOf(seconds).length() == 1) {
+//                    newtime = hours + ":" + minutes + ":0" + seconds;
+//                } else {
+//                    newtime = hours + ":" + minutes + ":" + seconds;
+//                }
+//
+//                myRef.child(facebookUserId).child("invitations").child("created").child(uuid).child("countDownMinute").setValue(newtime);
+//
+//            }
+//
+//            public void onFinish() {
+//
+//            }
+//        }.start();
     }
 
     public void initilizeOtherComponentsInvitations(View view) {

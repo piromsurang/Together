@@ -1,5 +1,8 @@
 package com.example.piromsurang.together.models;
 
+import java.util.Calendar;
+import java.util.Date;
+
 /**
  * Created by piromsurang on 29/3/2018 AD.
  */
@@ -11,25 +14,28 @@ public class ReceivedInvitation implements Invitation{
     private String location;
     private String countDownMinute;
     private String meeting_time;
-    private String currentTime;
+    private Date createdTime;
+    private Date timeoutTime;
     private int invitationType;
     private ReceivedStatus status;
     private String sender;
     private int index = -1;
 
     public ReceivedInvitation(String title,
-                             String location,
-                             String meeting_time,
-                             String countDownMinute,
-                             String currentTime,
-                             String sender,
-                             String uuid) {
+                              String location,
+                              String meeting_time,
+                              String countDownMinute,
+                              Date createdTime,
+                              Date timeoutTime,
+                              String sender,
+                              String uuid) {
         this.title = title;
         this.location = location;
         this.meeting_time = meeting_time;
         this.countDownMinute = countDownMinute;
-        this.currentTime = currentTime;
+        this.createdTime = createdTime;
         this.invitationType = RECEIVED;
+        this.timeoutTime = timeoutTime;
         this.uuid = uuid;
         this.sender = sender;
     }
@@ -66,8 +72,8 @@ public class ReceivedInvitation implements Invitation{
         return meeting_time;
     }
 
-    public String getCurrentTime() {
-        return currentTime;
+    public Date getCreatedTime() {
+        return createdTime;
     }
 
     public void setCountDownMinute(String countDownMinute) {
@@ -84,6 +90,10 @@ public class ReceivedInvitation implements Invitation{
 
     public void setIndex(int index) {
         this.index = index;
+    }
+
+    public Date getTimeoutTime() {
+        return timeoutTime;
     }
 
     @Override
