@@ -1,7 +1,12 @@
 package com.example.piromsurang.together.models;
 
+import android.util.Log;
+
+import com.google.firebase.database.DatabaseReference;
+
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 
 /**
@@ -83,11 +88,20 @@ public class CreatedInvitation implements Invitation{
     }
 
     public void setInvitedFriends(ArrayList<Friend> invitedFriends) {
-        this.invitedFriends = invitedFriends;
+        for(Friend friend : invitedFriends) {
+            this.invitedFriends.add(friend);
+        }
     }
 
     public Date getTimeoutTime() {
         return timeoutTime;
+    }
+
+    public void updateInvitedFriendsCountdownTime(DatabaseReference myRef, String time) {
+        for(int i = 0 ; i < getInvitedFriends().size() ; i++) {
+            Log.d("Testing countdown", getInvitedFriends().get(i).getName());
+            myRef.child(getInvitedFriends().get(i).getId()).child("invitations").child("received").child(getUuid()).child("countDownMinute").setValue(time);
+        }
     }
 
     @Override
