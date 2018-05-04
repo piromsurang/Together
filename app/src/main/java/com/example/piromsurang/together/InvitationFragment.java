@@ -160,7 +160,10 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
 //        loadFacebookFriends();
 //        loadInvitations();
 
-        new DownloadTasks().execute();
+        // cannot use because facebook doesn't allow fetching for all friend list
+//        new DownloadTasks().execute();
+
+        mockupFriends();
     }
 
     @Override
@@ -659,6 +662,26 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
 
             return null;
         }
+    }
+
+    public void mockupFriends() {
+//        Log.d("Testing friends", facebookUserId);
+        if(facebookUserId.equals("104782297049822")) {
+            friendPresenter.addFriend(new Friend("111539229705180", "Dick Wisemanman"));
+            friendPresenter.addFriend(new Friend("120743935449791", "Mark McDonaldstein"));
+        } else if(facebookUserId.equals("110532689806573")) {
+            friendPresenter.addFriend(new Friend("120743935449791", "Mark McDonaldstein"));
+        } else if(facebookUserId.equals("111539229705180")) {
+            friendPresenter.addFriend(new Friend("120743935449791", "Mark McDonaldstein"));
+            friendPresenter.addFriend(new Friend("104782297049822", "Linda Chaisen"));
+        } else if(facebookUserId.equals("120743935449791")) {
+            friendPresenter.addFriend(new Friend("104782297049822", "Linda Chaisen"));
+            friendPresenter.addFriend(new Friend("111539229705180", "Dick Wisemanman"));
+            friendPresenter.addFriend(new Friend("110532689806573", "Ullrich Fallersen"));
+        }
+
+//        Log.d("Testing friends", friendPresenter.getSearchedList().size()+"");
+
     }
 
 }
