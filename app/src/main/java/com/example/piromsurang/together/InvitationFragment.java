@@ -508,10 +508,6 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
                             }.start();
                         } else {
                             myRef.child(facebookUserId).child("invitations").child("created").child(createdInvitation.getUuid()).child("countDownMinute").setValue("00:00:00");
-
-                            for(int i = 0 ; i < createdInvitation.getInvitedFriends().size() ; i++) {
-                                myRef.child(createdInvitation.getInvitedFriends().get(i).getId()).child("invitations").child("received").child(createdInvitation.getUuid()).child("countDownMinute").setValue("00:00:00");
-                            }
                         }
                     } catch(NullPointerException e) {
                         e.printStackTrace();

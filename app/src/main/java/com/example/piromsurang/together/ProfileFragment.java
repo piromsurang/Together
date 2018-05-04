@@ -177,7 +177,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                         // Application code
                         try {
                             String name = object.getString("name");
-//                            Log.d("Test", name);
+//                            Log.d("Test", object.toString());
                             displayedName.setText(name);
                         } catch (JSONException e) {
 
