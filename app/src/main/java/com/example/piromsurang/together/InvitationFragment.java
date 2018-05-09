@@ -161,7 +161,7 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
 //        loadInvitations();
 
         // cannot use because facebook doesn't allow fetching for all friend list
-//        new DownloadTasks().execute();
+        new DownloadTasks().execute();
 
         mockupFriends();
     }
@@ -319,7 +319,11 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
             }
 
             public void onFinish() {
-
+                for(int i = 0 ; i < cc.getInvitedFriends().size() ; i++) {
+                    if(cc.getInvitedFriends().get(i).getStatus() == ReceivedInvitation.ReceivedStatus.WAITING) {
+                        cc.getInvitedFriends().get(i).setStatus(ReceivedInvitation.ReceivedStatus.DECLINE);
+                    }
+                }
             }
         }.start();
 
@@ -506,17 +510,27 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
                                 }
 
                                 public void onFinish() {
-
+                                    for(int i = 0 ; i < createdInvitation.getInvitedFriends().size() ; i++) {
+                                        if(createdInvitation.getInvitedFriends().get(i).getStatus() == ReceivedInvitation.ReceivedStatus.WAITING) {
+                                            createdInvitation.getInvitedFriends().get(i).setStatus(ReceivedInvitation.ReceivedStatus.DECLINE);
+                                        }
+                                    }
                                 }
                             }.start();
                         } else {
                             myRef.child(facebookUserId).child("invitations").child("created").child(createdInvitation.getUuid()).child("countDownMinute").setValue("00:00:00");
+                            for(int i = 0 ; i < createdInvitation.getInvitedFriends().size() ; i++) {
+                                if(createdInvitation.getInvitedFriends().get(i).getStatus() == ReceivedInvitation.ReceivedStatus.WAITING) {
+                                    createdInvitation.getInvitedFriends().get(i).setStatus(ReceivedInvitation.ReceivedStatus.DECLINE);
+                                }
+                            }
                         }
                     } catch(NullPointerException e) {
                         e.printStackTrace();
                     }
 
                     invitationPresenter.displayRecycleView();
+                    Log.d("Testing", createdInvitation.getTitle());
 //                Log.d("Test retreiving db", createdInvitation.getInvitedFriends().size()+"");
                 }
 
@@ -553,15 +567,19 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
 
             final DatabaseReference createdInvitationRef = database.getReference(facebookUserId).child("invitations").child("received");
             createdInvitationRef.addChildEventListener(new ChildEventListener() {
+
+                private CountDownTimer countDownTimer;
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    Log.d("receiving testing", "o");
                     final ReceivedInvitation receivedInvitation = dataSnapshot.getValue(ReceivedInvitation.class);
+                    if(receivedInvitation.getUuid() == null) {
+                        return;
+                    }
                     if((!invitationPresenter.getReceivedInvitationList().contains(receivedInvitation)) ){
                         invitationPresenter.addToReceivedInvitation(receivedInvitation);
                     }
                     if(receivedInvitation.getTimeoutTime().getTime() - Calendar.getInstance().getTime().getTime() > 0) {
-                        new CountDownTimer(receivedInvitation.getTimeoutTime().getTime() - Calendar.getInstance().getTime().getTime(), 1000) {
+                      countDownTimer = new CountDownTimer(receivedInvitation.getTimeoutTime().getTime() - Calendar.getInstance().getTime().getTime(), 1000) {
 
                             public void onTick(long millisUntilFinished) {
 
@@ -639,7 +657,15 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
 
                 @Override
                 public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+                    countDownTimer.cancel();
+                    ReceivedInvitation receivedInvitation = dataSnapshot.getValue(ReceivedInvitation.class);
+                    myRef.child(facebookUserId)
+                            .child("invitations")
+                            .child("received")
+                            .child(receivedInvitation.getUuid()).removeValue();
+                    invitationPresenter.removeFromReceivedInvitation(receivedInvitation);
+                    Log.d("Testing deleting", invitationPresenter.getReceivedInvitationList().size()+"");
+                    displayInvitationList();
                 }
 
                 @Override
@@ -656,7 +682,7 @@ public class InvitationFragment extends Fragment implements FriendView, Invitati
         }
 
         protected Void doInBackground(Void... params) {
-            loadFacebookFriends();
+//            loadFacebookFriends();
             loadCreatedInvitations();
             loadReceivedInvitations();
 

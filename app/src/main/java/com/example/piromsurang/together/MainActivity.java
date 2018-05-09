@@ -50,4 +50,9 @@ public class MainActivity extends AppCompatActivity implements InvitationFragmen
     public void onFragmentInteraction(Uri uri) {
     }
 
+    @Override
+    public void onBackPressed() {
+        android.os.Process.killProcess(android.os.Process.myPid());
+    }
+
 }

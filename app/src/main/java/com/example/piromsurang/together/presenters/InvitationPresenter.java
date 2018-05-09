@@ -38,7 +38,11 @@ public class InvitationPresenter {
     }
 
     public void removeFromReceivedInvitation(ReceivedInvitation invitation) {
-        invitationRepository.removeFromReceivedInvitation(invitation);
+        for(int i = 0 ; i < invitationRepository.getReceivedInvitationList().size(); i++) {
+            if(invitationRepository.getReceivedInvitationList().get(i).getUuid().equals(invitation.getUuid())) {
+                invitationRepository.removeReceivedInvitationFromIndex(i);
+            }
+        }
     }
 
     public String generateUuid() {
@@ -71,5 +75,18 @@ public class InvitationPresenter {
 
     public ReceivedInvitation getReceivedInvitationFromUuid(String uuid) {
         return invitationRepository.getReceivedInvitationFromUuid(uuid);
+    }
+
+    public void clearAll() {
+        invitationRepository.clearCreatedInvitaiton();
+        invitationRepository.clearReceivedInvitation();
+    }
+
+    public void clearCreatedInvitation() {
+        invitationRepository.clearCreatedInvitaiton();
+    }
+
+    public void clearReceivedInvitation() {
+        invitationRepository.clearReceivedInvitation();
     }
 }

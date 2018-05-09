@@ -65,4 +65,17 @@ public class InvitationRepository {
         }
         return new ReceivedInvitation();
     }
+
+    public void clearCreatedInvitaiton() {
+        this.createdInvitationList.clear();
+    }
+
+    public void clearReceivedInvitation() {
+        this.receivedInvitationList.clear();
+    }
+
+    public void removeReceivedInvitationFromIndex(int i) {
+        receivedInvitationList.remove(i);
+    }
+
 }

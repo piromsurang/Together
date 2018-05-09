@@ -1,16 +1,12 @@
 package com.example.piromsurang.together;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.FaceDetector;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,12 +15,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.AccessToken;
-import com.facebook.FacebookCallback;
+import com.facebook.GraphRequest.Callback;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
 import com.facebook.login.LoginManager;
-import com.facebook.login.LoginResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -33,6 +28,10 @@ import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.List;
+
+import static android.content.Context.ACTIVITY_SERVICE;
 
 
 /**
@@ -167,29 +166,26 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     }
 
     public void getUserDetails() {
-        GraphRequest request = GraphRequest.newMeRequest(
+
+        GraphRequest request = GraphRequest.newGraphPathRequest(
                 AccessToken.getCurrentAccessToken(),
-                new GraphRequest.GraphJSONObjectCallback() {
+                "/me?fields=id,name,email",
+                new GraphRequest.Callback() {
                     @Override
-                    public void onCompleted(
-                            JSONObject object,
-                            GraphResponse response) {
-                        // Application code
+                    public void onCompleted(GraphResponse response) {
+                        // Insert your code here
+
                         try {
-                            String name = object.getString("name");
-//                            Log.d("Test", object.toString());
+                            String name = response.getJSONObject().getString("name");
                             displayedName.setText(name);
                         } catch (JSONException e) {
 
 //                            Log.d("Test", object.toString());
                             e.printStackTrace();
                         }
-
+//                        Log.d("Test", response.toString());
                     }
                 });
-        Bundle parameters = new Bundle();
-        parameters.putString("fields", "id,name,link,birthday,location");
-        request.setParameters(parameters);
         request.executeAsync();
     }
 
@@ -214,6 +210,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             Log.d("Test", "already logged out.");
             return; // already logged out
         }
+
+
 
         new GraphRequest(AccessToken.getCurrentAccessToken(), "/me/permissions/", null, HttpMethod.DELETE, new GraphRequest
                 .Callback() {

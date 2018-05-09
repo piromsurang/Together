@@ -216,10 +216,10 @@ public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.Vi
                         .child("status")
                         .setValue(ReceivedInvitation.ReceivedStatus.DECLINE);
 
-//                databaseReference.child(getFacebookUserId())
-//                        .child("invitations")
-//                        .child("received")
-//                        .child(list.get(position).getUuid()).removeValue();
+                databaseReference.child(getFacebookUserId())
+                        .child("invitations")
+                        .child("received")
+                        .child(list.get(position).getUuid()).removeValue();
 
                 dialog.dismiss();
             }
@@ -237,10 +237,10 @@ public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.Vi
                         .child("status")
                         .setValue(ReceivedInvitation.ReceivedStatus.ACCEPT);
 
-//                databaseReference.child(getFacebookUserId())
-//                        .child("invitations")
-//                        .child("received")
-//                        .child(list.get(position).getUuid()).removeValue();
+                databaseReference.child(getFacebookUserId())
+                        .child("invitations")
+                        .child("received")
+                        .child(list.get(position).getUuid()).removeValue();
 
                 dialog.dismiss();
             }

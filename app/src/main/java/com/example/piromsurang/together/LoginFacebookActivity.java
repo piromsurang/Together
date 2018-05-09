@@ -135,27 +135,4 @@ public class LoginFacebookActivity extends AppCompatActivity {
                 });
     }
 
-
-    public void disconnectFromFacebook() {
-
-        if (AccessToken.getCurrentAccessToken() == null) {
-//            Log.d("Test", "already logged out.");
-            return; // already logged out
-        }
-
-        new GraphRequest(AccessToken.getCurrentAccessToken(), "/me/permissions/", null, HttpMethod.DELETE, new GraphRequest
-                .Callback() {
-            @Override
-            public void onCompleted(GraphResponse graphResponse) {
-
-                LoginManager.getInstance().logOut();
-
-//                Log.d("Test", "logout facebook");
-
-            }
-        }).executeAsync();
-    }
-
-
-
 }
